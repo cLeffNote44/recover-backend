@@ -1,0 +1,8 @@
+{
+          "workbench.editor.splitInGroupLayout": "horizontal",
+          "editor.mouseWheelZoom": true,
+          "editor.formatOnPaste": true,
+          "files.associations": {
+            "vercel.json": "jsonc"
+          }
+}

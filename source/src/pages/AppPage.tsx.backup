@@ -1,0 +1,2510 @@
+import React, { useState, useEffect } from 'react';
+import { Calendar, Plus, Award, Users, TrendingUp, CheckCircle, Heart, Phone, Mail, Clock, ChevronLeft, ChevronRight, X, User, Menu, Sparkles, BarChart3, Bell, Download, Upload, Trash2, Check, Flame, AlertCircle, Shield, Zap, Activity, Target, PhoneCall, MessageSquare, BookOpen, LifeBuoy, Moon, Sun, Smile, Frown, Meh, Laugh, Angry, Brain, Timer, Play, Pause, Edit } from 'lucide-react';
+
+export default function SobrietyApp() {
+  const [activeTab, setActiveTab] = useState('home');
+  const [sobrietyDate, setSobrietyDate] = useState('2024-01-01');
+  const [meetings, setMeetings] = useState([]);
+  const [growthLogs, setGrowthLogs] = useState([]);
+  const [challenges, setChallenges] = useState([]);
+  const [gratitude, setGratitude] = useState([]);
+  const [contacts, setContacts] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [checkIns, setCheckIns] = useState([]);
+  const [cravings, setCravings] = useState([]);
+  const [meditations, setMeditations] = useState([]);
+  const [relapsePlan, setRelapsePlan] = useState({
+    warningSigns: [],
+    highRiskSituations: [],
+    greenActions: [],
+    yellowActions: [],
+    redActions: []
+  });
+  const [darkMode, setDarkMode] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEmergencyModal, setShowEmergencyModal] = useState(false);
+  const [showPlanModal, setShowPlanModal] = useState(false);
+  const [showMeditationTimer, setShowMeditationTimer] = useState(false);
+  const [modalType, setModalType] = useState('');
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [meditationDuration, setMeditationDuration] = useState(0);
+  const [meditationRunning, setMeditationRunning] = useState(false);
+  const [meditationStartTime, setMeditationStartTime] = useState(null);
+
+  const moodEmojis = [
+    { value: 1, emoji: '😢', label: 'Very Bad', color: 'text-red-600' },
+    { value: 2, emoji: '😟', label: 'Bad', color: 'text-orange-600' },
+    { value: 3, emoji: '😐', label: 'Okay', color: 'text-yellow-600' },
+    { value: 4, emoji: '🙂', label: 'Good', color: 'text-green-600' },
+    { value: 5, emoji: '😄', label: 'Great', color: 'text-emerald-600' }
+  ];
+
+  const meditationTypes = [
+    'Mindfulness',
+    'Guided Meditation',
+    'Breathing Exercise',
+    'Body Scan',
+    'Loving-Kindness',
+    'Visualization',
+    'Walking Meditation',
+    'Mantra',
+    'Other'
+  ];
+
+  const motivationalQuotes = [
+    "One day at a time. You've got this.",
+    "Recovery is not a race. You don't have to feel guilty about taking your time.",
+    "Fall seven times, stand up eight.",
+    "The greatest glory in living lies not in never falling, but in rising every time we fall.",
+    "Your recovery is worth fighting for, every single day.",
+    "Progress, not perfection.",
+    "You are stronger than you know, braver than you believe.",
+    "Today is another chance to get better.",
+    "Recovery is an acceptance that your life is in shambles and you have to change.",
+    "The only person you are destined to become is the person you decide to be.",
+    "Every moment is a fresh beginning.",
+    "You didn't come this far to only come this far.",
+    "The comeback is always stronger than the setback.",
+    "Your story isn't over yet.",
+    "Courage doesn't always roar. Sometimes it's the quiet voice saying, 'I will try again tomorrow.'"
+  ];
+
+  const copingStrategies = [
+    { id: 1, title: "Deep Breathing", description: "Take 10 slow, deep breaths. Inhale for 4, hold for 4, exhale for 6.", icon: Activity },
+    { id: 2, title: "Call Your Sponsor", description: "Reach out to your sponsor or a trusted person in your support network.", icon: Phone },
+    { id: 3, title: "Go for a Walk", description: "Physical movement helps. Even 5 minutes outside can shift your mindset.", icon: TrendingUp },
+    { id: 4, title: "Play the Tape Forward", description: "Imagine the consequences of using. Where will you be in 1 hour? 1 day? 1 week?", icon: Target },
+    { id: 5, title: "HALT Check", description: "Are you Hungry, Angry, Lonely, or Tired? Address the real need.", icon: CheckCircle },
+    { id: 6, title: "Gratitude List", description: "Write down 3 things you're grateful for right now.", icon: Heart },
+    { id: 7, title: "Attend a Meeting", description: "Find an online or in-person meeting happening now.", icon: Users },
+    { id: 8, title: "Read Recovery Literature", description: "Open your recovery book or app and read for 10 minutes.", icon: BookOpen },
+    { id: 9, title: "Distract Yourself", description: "Do something engaging: puzzle, game, music, cleaning, cooking.", icon: Sparkles },
+    { id: 10, title: "Remember Your Why", description: "Look at your reasons for recovery. What do you have to lose?", icon: Award }
+  ];
+
+  const [currentQuote, setCurrentQuote] = useState(motivationalQuotes[0]);
+
+  // Load data from localStorage on mount
+  useEffect(() => {
+    const loadData = () => {
+      try {
+        const savedData = localStorage.getItem('sobrietyAppData');
+        if (savedData) {
+          const parsed = JSON.parse(savedData);
+          setSobrietyDate(parsed.sobrietyDate || '2024-01-01');
+          setMeetings(parsed.meetings || []);
+          setGrowthLogs(parsed.growthLogs || []);
+          setChallenges(parsed.challenges || []);
+          setGratitude(parsed.gratitude || []);
+          setContacts(parsed.contacts || []);
+          setEvents(parsed.events || []);
+          setCheckIns(parsed.checkIns || []);
+          setCravings(parsed.cravings || []);
+          setMeditations(parsed.meditations || []);
+          setRelapsePlan(parsed.relapsePlan || {
+            warningSigns: [],
+            highRiskSituations: [],
+            greenActions: [],
+            yellowActions: [],
+            redActions: []
+          });
+          setDarkMode(parsed.darkMode || false);
+        }
+      } catch (error) {
+        console.error('Error loading data:', error);
+      }
+    };
+    loadData();
+    
+    const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+    setCurrentQuote(randomQuote);
+  }, []);
+
+  // Save data to localStorage whenever it changes
+  useEffect(() => {
+    const saveData = () => {
+      try {
+        const dataToSave = {
+          sobrietyDate,
+          meetings,
+          growthLogs,
+          challenges,
+          gratitude,
+          contacts,
+          events,
+          checkIns,
+          cravings,
+          meditations,
+          relapsePlan,
+          darkMode
+        };
+        localStorage.setItem('sobrietyAppData', JSON.stringify(dataToSave));
+      } catch (error) {
+        console.error('Error saving data:', error);
+      }
+    };
+    saveData();
+  }, [sobrietyDate, meetings, growthLogs, challenges, gratitude, contacts, events, checkIns, cravings, meditations, relapsePlan, darkMode]);
+
+  // Meditation timer
+  useEffect(() => {
+    let interval;
+    if (meditationRunning && meditationStartTime) {
+      interval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - meditationStartTime) / 1000);
+        setMeditationDuration(elapsed);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [meditationRunning, meditationStartTime]);
+
+  // Check for upcoming events and create notifications
+  useEffect(() => {
+    const checkUpcomingEvents = () => {
+      const now = new Date();
+      const upcoming = events.filter(event => {
+        const eventDate = new Date(event.eventDate);
+        const diffHours = (eventDate - now) / (1000 * 60 * 60);
+        return diffHours > 0 && diffHours <= 24;
+      });
+      
+      const newNotifications = upcoming.map(event => ({
+        id: `event-${event.id}`,
+        type: 'event',
+        title: 'Upcoming Event',
+        message: `${event.title} is coming up soon`,
+        time: new Date().toISOString()
+      }));
+      
+      setNotifications(prev => {
+        const existingIds = prev.map(n => n.id);
+        const filtered = newNotifications.filter(n => !existingIds.includes(n.id));
+        return [...prev, ...filtered];
+      });
+    };
+    
+    checkUpcomingEvents();
+    const interval = setInterval(checkUpcomingEvents, 60000);
+    return () => clearInterval(interval);
+  }, [events]);
+
+  const calculateDaysSober = () => {
+    const start = new Date(sobrietyDate);
+    const today = new Date();
+    const diffTime = Math.abs(today - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const getMilestone = (days) => {
+    if (days >= 365) return { text: `${Math.floor(days / 365)} Year${Math.floor(days / 365) > 1 ? 's' : ''}`, gradient: 'from-violet-600 via-purple-600 to-fuchsia-600', glow: 'shadow-purple-500/50' };
+    if (days >= 180) return { text: '6 Months', gradient: 'from-blue-600 via-cyan-600 to-teal-600', glow: 'shadow-blue-500/50' };
+    if (days >= 90) return { text: '90 Days', gradient: 'from-emerald-600 via-green-600 to-teal-600', glow: 'shadow-green-500/50' };
+    if (days >= 30) return { text: '30 Days', gradient: 'from-amber-600 via-orange-600 to-yellow-600', glow: 'shadow-amber-500/50' };
+    if (days >= 7) return { text: '1 Week', gradient: 'from-orange-600 via-red-600 to-pink-600', glow: 'shadow-orange-500/50' };
+    return { text: 'Starting Strong', gradient: 'from-rose-600 via-pink-600 to-red-600', glow: 'shadow-rose-500/50' };
+  };
+
+  const daysSober = calculateDaysSober();
+  const milestone = getMilestone(daysSober);
+
+  // Check-in functions
+  const hasCheckedInToday = () => {
+    const today = new Date().toDateString();
+    return checkIns.some(checkIn => new Date(checkIn.date).toDateString() === today);
+  };
+
+  const checkInToday = (mood = null) => {
+    if (hasCheckedInToday() && mood === null) {
+      addNotification('info', 'Already Checked In', 'You already checked in today!');
+      return;
+    }
+    
+    if (mood !== null && hasCheckedInToday()) {
+      // Update mood for today's check-in
+      const today = new Date().toDateString();
+      setCheckIns(checkIns.map(checkIn => 
+        new Date(checkIn.date).toDateString() === today 
+          ? { ...checkIn, mood } 
+          : checkIn
+      ));
+      addNotification('success', 'Mood Updated', `Mood set to ${moodEmojis.find(m => m.value === mood)?.label}!`);
+      return;
+    }
+    
+    const newCheckIn = {
+      id: Date.now(),
+      date: new Date().toISOString(),
+      mood: mood
+    };
+    
+    setCheckIns([newCheckIn, ...checkIns]);
+    
+    const streak = getCurrentStreak();
+    const messages = [
+      `Great job! You're on a ${streak + 1} day streak! 🔥`,
+      `Checked in! Keep that ${streak + 1} day streak going! 💪`,
+      `Another day, another victory! ${streak + 1} days strong! ⭐`,
+      `You're doing amazing! ${streak + 1} consecutive check-ins! 🌟`
+    ];
+    
+    addNotification('success', 'Daily Check-In Complete', messages[Math.floor(Math.random() * messages.length)]);
+  };
+
+  const getCurrentStreak = () => {
+    if (checkIns.length === 0) return 0;
+    
+    const sortedCheckIns = [...checkIns].sort((a, b) => new Date(b.date) - new Date(a.date));
+    let streak = 0;
+    let currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+    
+    for (const checkIn of sortedCheckIns) {
+      const checkInDate = new Date(checkIn.date);
+      checkInDate.setHours(0, 0, 0, 0);
+      
+      const diffDays = Math.floor((currentDate - checkInDate) / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === streak) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+    
+    return streak;
+  };
+
+  const getMeditationStreak = () => {
+    if (meditations.length === 0) return 0;
+    
+    const sortedMeditations = [...meditations].sort((a, b) => new Date(b.date) - new Date(a.date));
+    let streak = 0;
+    let currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+    
+    for (const meditation of sortedMeditations) {
+      const meditationDate = new Date(meditation.date);
+      meditationDate.setHours(0, 0, 0, 0);
+      
+      const diffDays = Math.floor((currentDate - meditationDate) / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === streak) {
+        streak++;
+        // Only count one meditation per day for streak
+        const nextDate = new Date(currentDate);
+        nextDate.setDate(nextDate.getDate() - 1);
+        currentDate = nextDate;
+      } else {
+        break;
+      }
+    }
+    
+    return streak;
+  };
+
+  const getTotalMeditationMinutes = () => {
+    return meditations.reduce((total, m) => total + (m.duration || 0), 0);
+  };
+
+  const getMoodTrend = () => {
+    const last7Days = checkIns
+      .filter(c => c.mood !== null && c.mood !== undefined)
+      .slice(0, 7)
+      .reverse();
+    
+    if (last7Days.length < 2) return null;
+    
+    const avgFirst = last7Days.slice(0, Math.ceil(last7Days.length / 2)).reduce((sum, c) => sum + c.mood, 0) / Math.ceil(last7Days.length / 2);
+    const avgLast = last7Days.slice(Math.ceil(last7Days.length / 2)).reduce((sum, c) => sum + c.mood, 0) / Math.floor(last7Days.length / 2);
+    
+    if (avgLast > avgFirst + 0.3) return 'improving';
+    if (avgLast < avgFirst - 0.3) return 'declining';
+    return 'stable';
+  };
+
+  const addItem = (type, data) => {
+    const newItem = { ...data, id: Date.now(), date: new Date().toISOString() };
+    switch(type) {
+      case 'meeting':
+        setMeetings([newItem, ...meetings]);
+        break;
+      case 'growth':
+        setGrowthLogs([newItem, ...growthLogs]);
+        break;
+      case 'challenge':
+        setChallenges([newItem, ...challenges]);
+        break;
+      case 'gratitude':
+        setGratitude([newItem, ...gratitude]);
+        break;
+      case 'contact':
+        setContacts([newItem, ...contacts]);
+        break;
+      case 'event':
+        setEvents([newItem, ...events]);
+        break;
+      case 'craving':
+        setCravings([newItem, ...cravings]);
+        break;
+      case 'meditation':
+        setMeditations([newItem, ...meditations]);
+        break;
+    }
+    setShowAddModal(false);
+    
+    addNotification('success', 'Item Added', `Successfully added ${type}`);
+  };
+
+  const deleteItem = (type, id) => {
+    if (!confirm('Are you sure you want to delete this item?')) return;
+    
+    switch(type) {
+      case 'meeting':
+        setMeetings(meetings.filter(m => m.id !== id));
+        break;
+      case 'growth':
+        setGrowthLogs(growthLogs.filter(g => g.id !== id));
+        break;
+      case 'challenge':
+        setChallenges(challenges.filter(c => c.id !== id));
+        break;
+      case 'gratitude':
+        setGratitude(gratitude.filter(g => g.id !== id));
+        break;
+      case 'contact':
+        setContacts(contacts.filter(c => c.id !== id));
+        break;
+      case 'event':
+        setEvents(events.filter(e => e.id !== id));
+        break;
+      case 'craving':
+        setCravings(cravings.filter(c => c.id !== id));
+        break;
+      case 'meditation':
+        setMeditations(meditations.filter(m => m.id !== id));
+        break;
+    }
+    
+    addNotification('info', 'Item Deleted', `${type} has been removed`);
+  };
+
+  const addNotification = (type, title, message) => {
+    const notification = {
+      id: Date.now(),
+      type,
+      title,
+      message,
+      time: new Date().toISOString()
+    };
+    setNotifications(prev => [notification, ...prev]);
+    
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== notification.id));
+    }, 5000);
+  };
+
+  const exportData = () => {
+    const dataToExport = {
+      sobrietyDate,
+      meetings,
+      growthLogs,
+      challenges,
+      gratitude,
+      contacts,
+      events,
+      checkIns,
+      cravings,
+      meditations,
+      relapsePlan,
+      darkMode,
+      exportDate: new Date().toISOString()
+    };
+    
+    const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `sobriety-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    addNotification('success', 'Data Exported', 'Your data has been backed up successfully');
+  };
+
+  const importData = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const imported = JSON.parse(e.target.result);
+        setSobrietyDate(imported.sobrietyDate || sobrietyDate);
+        setMeetings(imported.meetings || []);
+        setGrowthLogs(imported.growthLogs || []);
+        setChallenges(imported.challenges || []);
+        setGratitude(imported.gratitude || []);
+        setContacts(imported.contacts || []);
+        setEvents(imported.events || []);
+        setCheckIns(imported.checkIns || []);
+        setCravings(imported.cravings || []);
+        setMeditations(imported.meditations || []);
+        setRelapsePlan(imported.relapsePlan || relapsePlan);
+        setDarkMode(imported.darkMode || false);
+        
+        addNotification('success', 'Data Imported', 'Your data has been restored successfully');
+      } catch (error) {
+        addNotification('error', 'Import Failed', 'Could not import data file');
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const startMeditation = () => {
+    setMeditationDuration(0);
+    setMeditationStartTime(Date.now());
+    setMeditationRunning(true);
+  };
+
+  const pauseMeditation = () => {
+    setMeditationRunning(false);
+  };
+
+  const resumeMeditation = () => {
+    setMeditationStartTime(Date.now() - (meditationDuration * 1000));
+    setMeditationRunning(true);
+  };
+
+  const completeMeditation = (type) => {
+    const newMeditation = {
+      id: Date.now(),
+      date: new Date().toISOString(),
+      duration: Math.floor(meditationDuration / 60), // Convert to minutes
+      type: type,
+      seconds: meditationDuration
+    };
+    
+    setMeditations([newMeditation, ...meditations]);
+    setMeditationDuration(0);
+    setMeditationRunning(false);
+    setMeditationStartTime(null);
+    setShowMeditationTimer(false);
+    
+    addNotification('success', 'Meditation Complete', `Great job! ${Math.floor(meditationDuration / 60)} minutes of ${type}`);
+  };
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const getDaysInMonth = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+    
+    return { daysInMonth, startingDayOfWeek, year, month };
+  };
+
+  const getEventsForDate = (date) => {
+    return events.filter(event => {
+      const eventDate = new Date(event.eventDate);
+      return eventDate.toDateString() === date.toDateString();
+    });
+  };
+
+  const getCheckInsForDate = (date) => {
+    return checkIns.filter(checkIn => {
+      const checkInDate = new Date(checkIn.date);
+      return checkInDate.toDateString() === date.toDateString();
+    });
+  };
+
+  // Craving analytics
+  const getCravingPatterns = () => {
+    const triggerCount = {};
+    const timeOfDay = { morning: 0, afternoon: 0, evening: 0, night: 0 };
+    
+    cravings.forEach(craving => {
+      if (craving.trigger) {
+        triggerCount[craving.trigger] = (triggerCount[craving.trigger] || 0) + 1;
+      }
+      
+      const hour = new Date(craving.date).getHours();
+      if (hour >= 5 && hour < 12) timeOfDay.morning++;
+      else if (hour >= 12 && hour < 17) timeOfDay.afternoon++;
+      else if (hour >= 17 && hour < 21) timeOfDay.evening++;
+      else timeOfDay.night++;
+    });
+    
+    return { triggerCount, timeOfDay };
+  };
+
+  const MeditationTimer = () => (
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
+      <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-3xl p-8 max-w-lg w-full shadow-2xl animate-slideUp`}>
+        <div className="flex justify-between items-center mb-6">
+          <h3 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>Meditation Timer</h3>
+          <button 
+            onClick={() => {
+              setShowMeditationTimer(false);
+              setMeditationRunning(false);
+              setMeditationDuration(0);
+            }} 
+            className={`${darkMode ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-700' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'} p-2 rounded-full transition-all`}
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        <div className="text-center mb-8">
+          <div className={`text-7xl font-black mb-4 ${darkMode ? 'text-purple-400' : 'text-purple-600'}`}>
+            {formatTime(meditationDuration)}
+          </div>
+          <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            {meditationRunning ? 'Meditation in progress...' : 'Ready to meditate'}
+          </p>
+        </div>
+
+        <div className="flex gap-3 mb-6">
+          {!meditationRunning && meditationDuration === 0 && (
+            <button
+              onClick={startMeditation}
+              className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-2xl flex items-center justify-center gap-3 hover:from-purple-700 hover:to-pink-700 font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+            >
+              <Play className="w-6 h-6" />
+              Start
+            </button>
+          )}
+          
+          {meditationRunning && (
+            <button
+              onClick={pauseMeditation}
+              className="flex-1 bg-gradient-to-r from-orange-600 to-amber-600 text-white py-4 rounded-2xl flex items-center justify-center gap-3 hover:from-orange-700 hover:to-amber-700 font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+            >
+              <Pause className="w-6 h-6" />
+              Pause
+            </button>
+          )}
+          
+          {!meditationRunning && meditationDuration > 0 && (
+            <button
+              onClick={resumeMeditation}
+              className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 rounded-2xl flex items-center justify-center gap-3 hover:from-green-700 hover:to-emerald-700 font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+            >
+              <Play className="w-6 h-6" />
+              Resume
+            </button>
+          )}
+        </div>
+
+        {meditationDuration >= 60 && (
+          <div className="space-y-2">
+            <p className={`text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Complete meditation as:</p>
+            <div className="grid grid-cols-2 gap-2">
+              {meditationTypes.map(type => (
+                <button
+                  key={type}
+                  onClick={() => completeMeditation(type)}
+                  className={`${darkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'} py-2 px-3 rounded-xl font-medium text-sm transition-all`}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const RelapsePlanModal = () => {
+    const [editPlan, setEditPlan] = useState(relapsePlan);
+    const [newItem, setNewItem] = useState('');
+    const [activeSection, setActiveSection] = useState('warning');
+
+    const addToSection = (section) => {
+      if (!newItem.trim()) return;
+      setEditPlan({
+        ...editPlan,
+        [section]: [...editPlan[section], newItem]
+      });
+      setNewItem('');
+    };
+
+    const removeFromSection = (section, index) => {
+      setEditPlan({
+        ...editPlan,
+        [section]: editPlan[section].filter((_, i) => i !== index)
+      });
+    };
+
+    const savePlan = () => {
+      setRelapsePlan(editPlan);
+      setShowPlanModal(false);
+      addNotification('success', 'Plan Saved', 'Your relapse prevention plan has been updated');
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn overflow-y-auto">
+        <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-3xl p-8 max-w-3xl w-full my-8 shadow-2xl animate-slideUp`}>
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center gap-3">
+              <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-3 rounded-2xl">
+                <Shield className="w-8 h-8 text-white" />
+              </div>
+              <h3 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>Relapse Prevention Plan</h3>
+            </div>
+            <button 
+              onClick={() => setShowPlanModal(false)} 
+              className={`${darkMode ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-700' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'} p-2 rounded-full transition-all`}
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          <div className="mb-6">
+            <div className="flex gap-2 mb-4">
+              {[
+                { id: 'warning', label: 'Warning Signs', color: 'yellow' },
+                { id: 'highRisk', label: 'High-Risk', color: 'orange' },
+                { id: 'green', label: 'Green Zone', color: 'green' },
+                { id: 'yellow', label: 'Yellow Zone', color: 'yellow' },
+                { id: 'red', label: 'Red Zone', color: 'red' }
+              ].map(section => (
+                <button
+                  key={section.id}
+                  onClick={() => setActiveSection(section.id)}
+                  className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all ${
+                    activeSection === section.id
+                      ? `bg-${section.color}-600 text-white`
+                      : darkMode 
+                        ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  {section.label}
+                </button>
+              ))}
+            </div>
+
+            {activeSection === 'warning' && (
+              <div>
+                <h4 className={`font-bold text-lg mb-3 ${darkMode ? 'text-white' : 'text-gray-800'}`}>My Warning Signs</h4>
+                <p className={`text-sm mb-4 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Early indicators that I'm at risk (mood changes, behaviors, thoughts)
+                </p>
+                <div className="space-y-2 mb-4">
+                  {editPlan.warningSigns.map((sign, idx) => (
+                    <div key={idx} className={`flex items-center justify-between ${darkMode ? 'bg-gray-700' : 'bg-yellow-50'} p-3 rounded-xl`}>
+                      <span className={darkMode ? 'text-gray-200' : 'text-gray-800'}>{sign}</span>
+                      <button onClick={() => removeFromSection('warningSigns', idx)} className="text-red-500 hover:text-red-700">
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newItem}
+                    onChange={(e) => setNewItem(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && addToSection('warningSigns')}
+                    placeholder="Add warning sign..."
+                    className={`flex-1 p-3 border-2 rounded-xl ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-200'}`}
+                  />
+                  <button
+                    onClick={() => addToSection('warningSigns')}
+                    className="bg-yellow-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-yellow-700"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {activeSection === 'highRisk' && (
+              <div>
+                <h4 className={`font-bold text-lg mb-3 ${darkMode ? 'text-white' : 'text-gray-800'}`}>High-Risk Situations</h4>
+                <p className={`text-sm mb-4 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  People, places, events, or emotions that trigger cravings
+                </p>
+                <div className="space-y-2 mb-4">
+                  {editPlan.highRiskSituations.map((situation, idx) => (
+                    <div key={idx} className={`flex items-center justify-between ${darkMode ? 'bg-gray-700' : 'bg-orange-50'} p-3 rounded-xl`}>
+                      <span className={darkMode ? 'text-gray-200' : 'text-gray-800'}>{situation}</span>
+                      <button onClick={() => removeFromSection('highRiskSituations', idx)} className="text-red-500 hover:text-red-700">
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newItem}
+                    onChange={(e) => setNewItem(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && addToSection('highRiskSituations')}
+                    placeholder="Add high-risk situation..."
+                    className={`flex-1 p-3 border-2 rounded-xl ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-200'}`}
+                  />
+                  <button
+                    onClick={() => addToSection('highRiskSituations')}
+                    className="bg-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-orange-700"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {activeSection === 'green' && (
+              <div>
+                <h4 className={`font-bold text-lg mb-3 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Green Zone - Maintenance</h4>
+                <p className={`text-sm mb-4 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Daily actions to stay healthy and prevent relapse
+                </p>
+                <div className="space-y-2 mb-4">
+                  {editPlan.greenActions.map((action, idx) => (
+                    <div key={idx} className={`flex items-center justify-between ${darkMode ? 'bg-gray-700' : 'bg-green-50'} p-3 rounded-xl`}>
+                      <span className={darkMode ? 'text-gray-200' : 'text-gray-800'}>{action}</span>
+                      <button onClick={() => removeFromSection('greenActions', idx)} className="text-red-500 hover:text-red-700">
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newItem}
+                    onChange={(e) => setNewItem(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && addToSection('greenActions')}
+                    placeholder="Add maintenance action..."
+                    className={`flex-1 p-3 border-2 rounded-xl ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-200'}`}
+                  />
+                  <button
+                    onClick={() => addToSection('greenActions')}
+                    className="bg-green-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-green-700"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {activeSection === 'yellow' && (
+              <div>
+                <h4 className={`font-bold text-lg mb-3 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Yellow Zone - Caution</h4>
+                <p className={`text-sm mb-4 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Actions to take when warning signs appear
+                </p>
+                <div className="space-y-2 mb-4">
+                  {editPlan.yellowActions.map((action, idx) => (
+                    <div key={idx} className={`flex items-center justify-between ${darkMode ? 'bg-gray-700' : 'bg-yellow-50'} p-3 rounded-xl`}>
+                      <span className={darkMode ? 'text-gray-200' : 'text-gray-800'}>{action}</span>
+                      <button onClick={() => removeFromSection('yellowActions', idx)} className="text-red-500 hover:text-red-700">
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newItem}
+                    onChange={(e) => setNewItem(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && addToSection('yellowActions')}
+                    placeholder="Add caution action..."
+                    className={`flex-1 p-3 border-2 rounded-xl ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-200'}`}
+                  />
+                  <button
+                    onClick={() => addToSection('yellowActions')}
+                    className="bg-yellow-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-yellow-700"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {activeSection === 'red' && (
+              <div>
+                <h4 className={`font-bold text-lg mb-3 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Red Zone - Emergency</h4>
+                <p className={`text-sm mb-4 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Immediate actions during crisis or strong cravings
+                </p>
+                <div className="space-y-2 mb-4">
+                  {editPlan.redActions.map((action, idx) => (
+                    <div key={idx} className={`flex items-center justify-between ${darkMode ? 'bg-gray-700' : 'bg-red-50'} p-3 rounded-xl`}>
+                      <span className={darkMode ? 'text-gray-200' : 'text-gray-800'}>{action}</span>
+                      <button onClick={() => removeFromSection('redActions', idx)} className="text-red-500 hover:text-red-700">
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newItem}
+                    onChange={(e) => setNewItem(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && addToSection('redActions')}
+                    placeholder="Add emergency action..."
+                    className={`flex-1 p-3 border-2 rounded-xl ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-200'}`}
+                  />
+                  <button
+                    onClick={() => addToSection('redActions')}
+                    className="bg-red-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-red-700"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex gap-3 mt-6">
+            <button
+              onClick={savePlan}
+              className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-2xl hover:from-blue-700 hover:to-purple-700 font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+            >
+              Save Plan
+            </button>
+            <button
+              onClick={() => setShowPlanModal(false)}
+              className={`flex-1 ${darkMode ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'} py-4 rounded-2xl font-semibold transition-all`}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const AddModal = () => {
+    const [formData, setFormData] = useState({});
+
+    return (
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
+        <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-3xl p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-slideUp`}>
+          <div className="flex justify-between items-center mb-6">
+            <h3 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+              {modalType === 'meeting' && 'Add Meeting'}
+              {modalType === 'growth' && 'Add Growth Log'}
+              {modalType === 'challenge' && 'Add Challenge'}
+              {modalType === 'gratitude' && 'Add Gratitude'}
+              {modalType === 'contact' && 'Add Contact'}
+              {modalType === 'event' && 'Add Calendar Event'}
+              {modalType === 'craving' && 'Log Craving'}
+              {modalType === 'meditation' && 'Log Meditation'}
+            </h3>
+            <button 
+              onClick={() => setShowAddModal(false)} 
+              className={`${darkMode ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-700' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'} p-2 rounded-full transition-all`}
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+          
+          {modalType === 'meditation' && (
+            <div className="space-y-4">
+              <div>
+                <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Duration (minutes)</label>
+                <input
+                  type="number"
+                  min="1"
+                  placeholder="15"
+                  className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                  onChange={(e) => setFormData({...formData, duration: parseInt(e.target.value)})}
+                />
+              </div>
+              <select
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                onChange={(e) => setFormData({...formData, type: e.target.value})}
+              >
+                <option value="">Select Type</option>
+                {meditationTypes.map(type => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+              <textarea
+                placeholder="Notes (optional)"
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                rows="3"
+                onChange={(e) => setFormData({...formData, notes: e.target.value})}
+              />
+            </div>
+          )}
+
+          {modalType === 'craving' && (
+            <div className="space-y-4">
+              <div>
+                <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Intensity (1-10)</label>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  defaultValue="5"
+                  className="w-full"
+                  onChange={(e) => setFormData({...formData, intensity: parseInt(e.target.value)})}
+                />
+                <div className={`flex justify-between text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  <span>Mild</span>
+                  <span className="font-bold">{formData.intensity || 5}</span>
+                  <span>Severe</span>
+                </div>
+              </div>
+              <select
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                onChange={(e) => setFormData({...formData, trigger: e.target.value})}
+              >
+                <option value="">Select Trigger (optional)</option>
+                <option value="Stress">Stress</option>
+                <option value="Social Pressure">Social Pressure</option>
+                <option value="Boredom">Boredom</option>
+                <option value="Loneliness">Loneliness</option>
+                <option value="Anger">Anger</option>
+                <option value="Sadness">Sadness</option>
+                <option value="Celebration">Celebration</option>
+                <option value="Physical Pain">Physical Pain</option>
+                <option value="Seeing Others Use">Seeing Others Use</option>
+                <option value="Location/Place">Location/Place</option>
+                <option value="Other">Other</option>
+              </select>
+              <textarea
+                placeholder="What triggered this craving? (optional)"
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                rows="2"
+                onChange={(e) => setFormData({...formData, triggerNotes: e.target.value})}
+              />
+              <textarea
+                placeholder="What coping strategy did you use?"
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                rows="3"
+                onChange={(e) => setFormData({...formData, copingStrategy: e.target.value})}
+              />
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="overcame"
+                  className="w-5 h-5 rounded"
+                  onChange={(e) => setFormData({...formData, overcame: e.target.checked})}
+                />
+                <label htmlFor="overcame" className={`font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>I successfully overcame this craving</label>
+              </div>
+            </div>
+          )}
+
+          {modalType === 'meeting' && (
+            <div className="space-y-4">
+              <input
+                type="text"
+                placeholder="Meeting Name"
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+              />
+              <input
+                type="text"
+                placeholder="Location"
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                onChange={(e) => setFormData({...formData, location: e.target.value})}
+              />
+              <textarea
+                placeholder="Notes (optional)"
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                rows="3"
+                onChange={(e) => setFormData({...formData, notes: e.target.value})}
+              />
+            </div>
+          )}
+
+          {modalType === 'growth' && (
+            <div className="space-y-4">
+              <input
+                type="text"
+                placeholder="Title"
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                onChange={(e) => setFormData({...formData, title: e.target.value})}
+              />
+              <textarea
+                placeholder="What did you learn or accomplish?"
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                rows="4"
+                onChange={(e) => setFormData({...formData, content: e.target.value})}
+              />
+            </div>
+          )}
+
+          {modalType === 'challenge' && (
+            <div className="space-y-4">
+              <input
+                type="text"
+                placeholder="Challenge Title"
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                onChange={(e) => setFormData({...formData, title: e.target.value})}
+              />
+              <textarea
+                placeholder="Describe the challenge"
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                rows="3"
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+              />
+              <textarea
+                placeholder="How did you handle it?"
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                rows="3"
+                onChange={(e) => setFormData({...formData, response: e.target.value})}
+              />
+            </div>
+          )}
+
+          {modalType === 'gratitude' && (
+            <div className="space-y-4">
+              <textarea
+                placeholder="What are you grateful for today?"
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                rows="4"
+                onChange={(e) => setFormData({...formData, content: e.target.value})}
+              />
+            </div>
+          )}
+
+          {modalType === 'contact' && (
+            <div className="space-y-4">
+              <input
+                type="text"
+                placeholder="Name"
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+              />
+              <input
+                type="text"
+                placeholder="Role (e.g., Sponsor, Friend, Counselor)"
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                onChange={(e) => setFormData({...formData, role: e.target.value})}
+              />
+              <input
+                type="tel"
+                placeholder="Phone Number"
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                onChange={(e) => setFormData({...formData, phone: e.target.value})}
+              />
+              <input
+                type="email"
+                placeholder="Email (optional)"
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+              />
+              <textarea
+                placeholder="Notes (optional)"
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                rows="2"
+                onChange={(e) => setFormData({...formData, notes: e.target.value})}
+              />
+            </div>
+          )}
+
+          {modalType === 'event' && (
+            <div className="space-y-4">
+              <input
+                type="text"
+                placeholder="Event Title"
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                onChange={(e) => setFormData({...formData, title: e.target.value})}
+              />
+              <input
+                type="date"
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                onChange={(e) => setFormData({...formData, eventDate: e.target.value})}
+              />
+              <input
+                type="time"
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                onChange={(e) => setFormData({...formData, time: e.target.value})}
+              />
+              <input
+                type="text"
+                placeholder="Location (optional)"
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                onChange={(e) => setFormData({...formData, location: e.target.value})}
+              />
+              <textarea
+                placeholder="Description (optional)"
+                className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+                rows="2"
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+              />
+            </div>
+          )}
+
+          <div className="flex gap-3 mt-8">
+            <button
+              onClick={() => addItem(modalType, formData)}
+              className="flex-1 bg-gradient-to-r from-slate-800 to-slate-700 text-white py-4 rounded-2xl hover:from-slate-900 hover:to-slate-800 font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+            >
+              Save
+            </button>
+            <button
+              onClick={() => setShowAddModal(false)}
+              className={`flex-1 ${darkMode ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'} py-4 rounded-2xl font-semibold transition-all`}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const EmergencyModal = () => {
+    const primaryContact = contacts.find(c => c.role?.toLowerCase().includes('sponsor')) || contacts[0];
+    
+    const sendEmergencyText = (contact) => {
+      const message = encodeURIComponent("I'm struggling right now and need support. Can you talk?");
+      if (contact?.phone) {
+        window.open(`sms:${contact.phone}?body=${message}`, '_blank');
+        addNotification('success', 'Message Sent', `Emergency text sent to ${contact.name}`);
+      }
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
+        <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-slideUp`}>
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center gap-3">
+              <div className="bg-red-600 p-3 rounded-2xl">
+                <LifeBuoy className="w-8 h-8 text-white" />
+              </div>
+              <h3 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>Emergency Support</h3>
+            </div>
+            <button 
+              onClick={() => setShowEmergencyModal(false)} 
+              className={`${darkMode ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-700' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'} p-2 rounded-full transition-all`}
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          <div className="bg-red-50 border-l-4 border-red-600 p-4 rounded-xl mb-6">
+            <p className="text-red-800 font-semibold">You're not alone. This feeling will pass. Reach out for help.</p>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="space-y-3 mb-6">
+            <h4 className={`font-bold text-lg mb-3 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Quick Actions</h4>
+            
+            {primaryContact && (
+              <>
+                <button
+                  onClick={() => window.open(`tel:${primaryContact.phone}`, '_blank')}
+                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 px-6 rounded-2xl flex items-center justify-center gap-3 hover:from-green-700 hover:to-emerald-700 font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                >
+                  <PhoneCall className="w-6 h-6" />
+                  Call {primaryContact.name} ({primaryContact.role})
+                </button>
+                
+                <button
+                  onClick={() => sendEmergencyText(primaryContact)}
+                  className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-4 px-6 rounded-2xl flex items-center justify-center gap-3 hover:from-blue-700 hover:to-cyan-700 font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                >
+                  <MessageSquare className="w-6 h-6" />
+                  Text {primaryContact.name}
+                </button>
+              </>
+            )}
+
+            <button
+              onClick={() => window.open('tel:988', '_blank')}
+              className="w-full bg-gradient-to-r from-red-600 to-rose-600 text-white py-4 px-6 rounded-2xl flex items-center justify-center gap-3 hover:from-red-700 hover:to-rose-700 font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+            >
+              <Phone className="w-6 h-6" />
+              Call Crisis Hotline (988)
+            </button>
+
+            <button
+              onClick={() => { setShowEmergencyModal(false); setModalType('craving'); setShowAddModal(true); }}
+              className="w-full bg-gradient-to-r from-orange-600 to-amber-600 text-white py-4 px-6 rounded-2xl flex items-center justify-center gap-3 hover:from-orange-700 hover:to-amber-700 font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+            >
+              <AlertCircle className="w-6 h-6" />
+              Log This Craving
+            </button>
+          </div>
+
+          {/* Coping Strategies */}
+          <div>
+            <h4 className={`font-bold text-lg mb-3 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Coping Strategies - Try One Now</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-96 overflow-y-auto">
+              {copingStrategies.map(strategy => {
+                const Icon = strategy.icon;
+                return (
+                  <div key={strategy.id} className={`${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200'} p-4 rounded-2xl border-2 hover:border-blue-400 transition-all cursor-pointer hover:shadow-md`}>
+                    <div className="flex items-start gap-3">
+                      <div className="bg-blue-600 p-2 rounded-xl flex-shrink-0">
+                        <Icon className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h5 className={`font-bold mb-1 ${darkMode ? 'text-white' : 'text-gray-800'}`}>{strategy.title}</h5>
+                        <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{strategy.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mt-6 bg-green-50 border-l-4 border-green-600 p-4 rounded-xl">
+            <p className="text-green-800 font-semibold">Remember: This craving is temporary. You've overcome this before, and you can do it again. 💪</p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const NotificationPanel = () => (
+    <div className="fixed top-4 right-4 z-50 max-w-sm space-y-2">
+      {notifications.slice(0, 3).map(notif => (
+        <div 
+          key={notif.id}
+          className={`${darkMode ? 'bg-gray-800 border-blue-500' : 'bg-white border-blue-600'} rounded-2xl shadow-2xl p-4 border-l-4 animate-slideIn`}
+        >
+          <div className="flex items-start gap-3">
+            <Bell className="w-5 h-5 text-blue-600 mt-0.5" />
+            <div className="flex-1">
+              <h4 className={`font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>{notif.title}</h4>
+              <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{notif.message}</p>
+            </div>
+            <button
+              onClick={() => setNotifications(notifications.filter(n => n.id !== notif.id))}
+              className={darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'}
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const CheckInTab = () => {
+    const streak = getCurrentStreak();
+    const checkedInToday = hasCheckedInToday();
+    const todayCheckIn = checkIns.find(c => new Date(c.date).toDateString() === new Date().toDateString());
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - (6 - i));
+      return date;
+    });
+
+    return (
+      <div className="space-y-6 pb-24">
+        {/* Emergency Button */}
+        <button
+          onClick={() => setShowEmergencyModal(true)}
+          className="w-full bg-gradient-to-r from-red-600 to-rose-600 text-white py-6 rounded-3xl flex items-center justify-center gap-3 hover:from-red-700 hover:to-rose-700 font-bold shadow-2xl hover:shadow-red-500/50 transition-all transform hover:scale-105 text-xl"
+        >
+          <LifeBuoy className="w-8 h-8" />
+          I Need Help Now
+        </button>
+
+        {/* Check-in Card */}
+        <div className="bg-gradient-to-br from-green-600 to-emerald-600 text-white p-8 rounded-3xl shadow-2xl">
+          <div className="text-center">
+            <div className="bg-white/20 backdrop-blur-lg rounded-full w-24 h-24 mx-auto mb-4 flex items-center justify-center">
+              {checkedInToday ? (
+                <CheckCircle className="w-12 h-12 text-white" />
+              ) : (
+                <Check className="w-12 h-12 text-white" />
+              )}
+            </div>
+            <h2 className="text-3xl font-bold mb-2">Daily Check-In</h2>
+            {checkedInToday ? (
+              <p className="text-xl opacity-90">✓ Checked in today!</p>
+            ) : (
+              <p className="text-xl opacity-90">Ready to check in?</p>
+            )}
+            <button
+              onClick={() => checkInToday()}
+              disabled={checkedInToday}
+              className={`mt-6 px-8 py-4 rounded-2xl font-bold text-lg transition-all transform ${
+                checkedInToday
+                  ? 'bg-white/30 cursor-not-allowed'
+                  : 'bg-white text-green-600 hover:bg-green-50 hover:scale-105 shadow-lg'
+              }`}
+            >
+              {checkedInToday ? 'Already Checked In' : 'Check In Now'}
+            </button>
+          </div>
+        </div>
+
+        {/* Mood Selector */}
+        <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-3xl shadow-xl border ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+          <h3 className={`font-bold text-xl mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>How are you feeling?</h3>
+          <div className="grid grid-cols-5 gap-3">
+            {moodEmojis.map(mood => (
+              <button
+                key={mood.value}
+                onClick={() => checkInToday(mood.value)}
+                className={`aspect-square rounded-2xl flex flex-col items-center justify-center gap-2 transition-all transform hover:scale-110 ${
+                  todayCheckIn?.mood === mood.value
+                    ? darkMode
+                      ? 'bg-purple-900 border-2 border-purple-500'
+                      : 'bg-purple-100 border-2 border-purple-500'
+                    : darkMode
+                      ? 'bg-gray-700 hover:bg-gray-600'
+                      : 'bg-gray-50 hover:bg-gray-100'
+                }`}
+              >
+                <span className="text-4xl">{mood.emoji}</span>
+                <span className={`text-xs font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{mood.label}</span>
+              </button>
+            ))}
+          </div>
+          {todayCheckIn?.mood && (
+            <p className={`text-center mt-4 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              Today's mood: {moodEmojis.find(m => m.value === todayCheckIn.mood)?.label}
+            </p>
+          )}
+        </div>
+
+        {/* Streak Card */}
+        <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-3xl shadow-xl border ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="bg-gradient-to-br from-orange-500 to-red-600 p-3 rounded-2xl">
+              <Flame className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className={`font-bold text-2xl ${darkMode ? 'text-white' : 'text-gray-800'}`}>Current Streak</h3>
+              <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>Consecutive check-ins</p>
+            </div>
+          </div>
+          <div className="text-center py-6">
+            <p className="text-7xl font-black bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-2">
+              {streak}
+            </p>
+            <p className={`text-xl font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              {streak === 1 ? 'Day' : 'Days'} in a row 🔥
+            </p>
+          </div>
+        </div>
+
+        {/* Last 7 Days Visual */}
+        <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-3xl shadow-xl border ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+          <h3 className={`font-bold text-xl mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Last 7 Days</h3>
+          <div className="grid grid-cols-7 gap-2">
+            {last7Days.map((date, idx) => {
+              const dayCheckIns = getCheckInsForDate(date);
+              const hasCheckIn = dayCheckIns.length > 0;
+              const dayMood = dayCheckIns[0]?.mood;
+              const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+              const dayNum = date.getDate();
+              
+              return (
+                <div key={idx} className="text-center">
+                  <p className={`text-xs font-semibold mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{dayName}</p>
+                  <div className={`aspect-square rounded-2xl flex items-center justify-center text-sm font-bold transition-all ${
+                    hasCheckIn
+                      ? 'bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg'
+                      : darkMode
+                        ? 'bg-gray-700 text-gray-500'
+                        : 'bg-gray-100 text-gray-400'
+                  }`}>
+                    {hasCheckIn ? (
+                      dayMood ? (
+                        <span className="text-2xl">{moodEmojis.find(m => m.value === dayMood)?.emoji}</span>
+                      ) : (
+                        <Check className="w-6 h-6" />
+                      )
+                    ) : (
+                      dayNum
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-3xl shadow-lg border ${darkMode ? 'border-gray-700' : 'border-gray-100'} text-center`}>
+            <p className={`font-semibold mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total Check-Ins</p>
+            <p className="text-5xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              {checkIns.length}
+            </p>
+          </div>
+          <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-3xl shadow-lg border ${darkMode ? 'border-gray-700' : 'border-gray-100'} text-center`}>
+            <p className={`font-semibold mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>This Month</p>
+            <p className="text-5xl font-black bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+              {checkIns.filter(c => {
+                const checkInDate = new Date(c.date);
+                const now = new Date();
+                return checkInDate.getMonth() === now.getMonth() && checkInDate.getFullYear() === now.getFullYear();
+              }).length}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const CravingsTab = () => {
+    const patterns = getCravingPatterns();
+    const topTriggers = Object.entries(patterns.triggerCount)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 5);
+
+    return (
+      <div className="space-y-6 pb-24">
+        <button
+          onClick={() => { setModalType('craving'); setShowAddModal(true); }}
+          className="w-full bg-gradient-to-r from-red-600 to-orange-600 text-white py-4 rounded-2xl flex items-center justify-center gap-3 hover:from-red-700 hover:to-orange-700 font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+        >
+          <Plus className="w-6 h-6" />
+          Log Craving
+        </button>
+
+        {cravings.length > 0 && (
+          <>
+            <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-3xl shadow-xl border ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+              <h3 className={`font-bold text-xl mb-4 flex items-center gap-3 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                <BarChart3 className="w-6 h-6 text-orange-600" />
+                Pattern Analysis
+              </h3>
+              
+              {topTriggers.length > 0 && (
+                <div className="mb-6">
+                  <h4 className={`font-semibold mb-3 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Top Triggers</h4>
+                  <div className="space-y-2">
+                    {topTriggers.map(([trigger, count]) => (
+                      <div key={trigger}>
+                        <div className="flex justify-between mb-1">
+                          <span className={`text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{trigger}</span>
+                          <span className={`text-sm font-bold ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>{count}</span>
+                        </div>
+                        <div className={`w-full ${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded-full h-3`}>
+                          <div 
+                            className="bg-gradient-to-r from-red-500 to-orange-500 h-3 rounded-full transition-all"
+                            style={{ width: `${(count / cravings.length) * 100}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <h4 className={`font-semibold mb-3 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Time of Day</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  {Object.entries(patterns.timeOfDay).map(([time, count]) => (
+                    <div key={time} className={`${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gradient-to-br from-orange-50 to-red-50 border-orange-200'} p-4 rounded-2xl border`}>
+                      <p className={`text-xs font-semibold uppercase mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>{time}</p>
+                      <p className="text-3xl font-black text-orange-600">{count}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-3xl shadow-xl border ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+              <h3 className={`font-bold text-xl mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Success Rate</h3>
+              <div className="text-center py-6">
+                <p className="text-6xl font-black bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-2">
+                  {Math.round((cravings.filter(c => c.overcame).length / cravings.length) * 100)}%
+                </p>
+                <p className={`font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Cravings Overcome</p>
+                <p className={`text-sm mt-2 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                  {cravings.filter(c => c.overcame).length} out of {cravings.length} cravings
+                </p>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Craving Log */}
+        <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-3xl shadow-xl border ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+          <h3 className={`font-bold text-xl mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Craving History</h3>
+          {cravings.length === 0 ? (
+            <div className="text-center py-12">
+              <AlertCircle className={`w-16 h-16 mx-auto mb-4 ${darkMode ? 'text-gray-600' : 'text-gray-300'}`} />
+              <p className={darkMode ? 'text-gray-400' : 'text-gray-500'}>No cravings logged yet</p>
+              <p className={`text-sm mt-2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>Track cravings to identify patterns</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {cravings.map(craving => (
+                <div key={craving.id} className={`${darkMode ? 'bg-gray-700 border-red-500' : 'bg-gradient-to-r from-red-50 to-orange-50 border-red-600'} p-4 rounded-2xl border-l-4 relative group`}>
+                  <button
+                    onClick={() => deleteItem('craving', craving.id)}
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 hover:bg-red-600 text-white p-2 rounded-full"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>Intensity: {craving.intensity}/10</span>
+                        {craving.overcame && (
+                          <span className="bg-green-600 text-white text-xs px-2 py-1 rounded-full font-semibold">
+                            ✓ Overcame
+                          </span>
+                        )}
+                      </div>
+                      {craving.trigger && (
+                        <p className={`text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Trigger: {craving.trigger}</p>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {craving.triggerNotes && (
+                    <p className={`text-sm italic mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>"{craving.triggerNotes}"</p>
+                  )}
+                  
+                  {craving.copingStrategy && (
+                    <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} p-3 rounded-xl mt-2`}>
+                      <p className="text-xs text-green-700 font-bold mb-1">COPING STRATEGY USED:</p>
+                      <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{craving.copingStrategy}</p>
+                    </div>
+                  )}
+                  
+                  <p className={`text-xs mt-2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                    {new Date(craving.date).toLocaleString()}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const MeditationTab = () => {
+    const meditationStreak = getMeditationStreak();
+    const totalMinutes = getTotalMeditationMinutes();
+    const totalHours = Math.floor(totalMinutes / 60);
+    const remainingMinutes = totalMinutes % 60;
+
+    return (
+      <div className="space-y-6 pb-24">
+        <button
+          onClick={() => setShowMeditationTimer(true)}
+          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-2xl flex items-center justify-center gap-3 hover:from-purple-700 hover:to-pink-700 font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+        >
+          <Brain className="w-6 h-6" />
+          Start Meditation
+        </button>
+
+        <button
+          onClick={() => { setModalType('meditation'); setShowAddModal(true); }}
+          className={`w-full ${darkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'} py-4 rounded-2xl flex items-center justify-center gap-3 font-semibold transition-all`}
+        >
+          <Plus className="w-6 h-6" />
+          Log Past Meditation
+        </button>
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-3xl shadow-lg border ${darkMode ? 'border-gray-700' : 'border-gray-100'} text-center`}>
+            <p className={`font-semibold mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Streak</p>
+            <p className="text-5xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              {meditationStreak}
+            </p>
+            <p className={`text-sm mt-1 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>days</p>
+          </div>
+          <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-3xl shadow-lg border ${darkMode ? 'border-gray-700' : 'border-gray-100'} text-center`}>
+            <p className={`font-semibold mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total Time</p>
+            <p className="text-5xl font-black bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+              {totalHours > 0 ? totalHours : totalMinutes}
+            </p>
+            <p className={`text-sm mt-1 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>{totalHours > 0 ? `hours` : 'minutes'}</p>
+          </div>
+        </div>
+
+        {/* Session History */}
+        <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-3xl shadow-xl border ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+          <h3 className={`font-bold text-xl mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Meditation History</h3>
+          {meditations.length === 0 ? (
+            <div className="text-center py-12">
+              <Brain className={`w-16 h-16 mx-auto mb-4 ${darkMode ? 'text-gray-600' : 'text-gray-300'}`} />
+              <p className={darkMode ? 'text-gray-400' : 'text-gray-500'}>No meditations logged yet</p>
+              <p className={`text-sm mt-2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>Start your mindfulness practice</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {meditations.map(meditation => (
+                <div key={meditation.id} className={`${darkMode ? 'bg-gray-700 border-purple-500' : 'bg-gradient-to-r from-purple-50 to-pink-50 border-purple-600'} p-4 rounded-2xl border-l-4 relative group`}>
+                  <button
+                    onClick={() => deleteItem('meditation', meditation.id)}
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 hover:bg-red-600 text-white p-2 rounded-full"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  
+                  <div className="flex items-center gap-3 mb-2">
+                    <Brain className="w-6 h-6 text-purple-600" />
+                    <div>
+                      <h4 className={`font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>{meditation.type}</h4>
+                      <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>{meditation.duration} minutes</p>
+                    </div>
+                  </div>
+                  
+                  {meditation.notes && (
+                    <p className={`text-sm italic mt-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{meditation.notes}</p>
+                  )}
+                  
+                  <p className={`text-xs mt-2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                    {new Date(meditation.date).toLocaleString()}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const AnalyticsTab = () => {
+    const getActivityByMonth = () => {
+      const monthData = {};
+      const allItems = [...meetings, ...growthLogs, ...challenges, ...gratitude, ...checkIns, ...meditations];
+      
+      allItems.forEach(item => {
+        const date = new Date(item.date);
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        monthData[monthKey] = (monthData[monthKey] || 0) + 1;
+      });
+      
+      return Object.entries(monthData)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .slice(-6);
+    };
+
+    const activityData = getActivityByMonth();
+    const maxActivity = Math.max(...activityData.map(([, count]) => count), 1);
+
+    const getCategoryBreakdown = () => {
+      return [
+        { name: 'Check-Ins', count: checkIns.length, color: 'from-green-500 to-emerald-600', icon: Check },
+        { name: 'Meditations', count: meditations.length, color: 'from-purple-500 to-pink-600', icon: Brain },
+        { name: 'Meetings', count: meetings.length, color: 'from-emerald-500 to-teal-600', icon: Users },
+        { name: 'Growth Logs', count: growthLogs.length, color: 'from-blue-500 to-cyan-600', icon: TrendingUp },
+        { name: 'Challenges', count: challenges.length, color: 'from-orange-500 to-amber-600', icon: CheckCircle },
+        { name: 'Gratitude', count: gratitude.length, color: 'from-purple-500 to-pink-600', icon: Heart },
+        { name: 'Cravings Logged', count: cravings.length, color: 'from-red-500 to-orange-600', icon: AlertCircle }
+      ];
+    };
+
+    const getStreakData = () => {
+      const weeks = Math.floor(daysSober / 7);
+      const months = Math.floor(daysSober / 30);
+      const checkInStreak = getCurrentStreak();
+      const meditationStreak = getMeditationStreak();
+      return { weeks, months, checkInStreak, meditationStreak };
+    };
+
+    const streakData = getStreakData();
+    const categories = getCategoryBreakdown();
+    const totalEntries = meetings.length + growthLogs.length + challenges.length + gratitude.length + checkIns.length + cravings.length + meditations.length;
+    const moodTrend = getMoodTrend();
+
+    return (
+      <div className="space-y-6 pb-24">
+        <div className="bg-gradient-to-br from-indigo-600 to-purple-600 text-white p-8 rounded-3xl shadow-2xl">
+          <div className="flex items-center gap-3 mb-4">
+            <BarChart3 className="w-8 h-8" />
+            <h2 className="text-3xl font-bold">Analytics Dashboard</h2>
+          </div>
+          <p className="text-white/90">Track your recovery journey with detailed insights</p>
+        </div>
+
+        {/* Key Metrics */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-3xl shadow-lg border ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+            <div className="text-center">
+              <p className={`font-semibold mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total Entries</p>
+              <p className="text-5xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">{totalEntries}</p>
+            </div>
+          </div>
+          <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-3xl shadow-lg border ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+            <div className="text-center">
+              <p className={`font-semibold mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Check-In Streak</p>
+              <p className="text-5xl font-black bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">{streakData.checkInStreak}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Mood Trend */}
+        {moodTrend && (
+          <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-3xl shadow-lg border ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+            <h3 className={`font-bold text-xl mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Mood Trend (Last 7 Days)</h3>
+            <div className={`p-6 rounded-2xl ${
+              moodTrend === 'improving' 
+                ? 'bg-green-50 border-2 border-green-500' 
+                : moodTrend === 'declining'
+                  ? 'bg-red-50 border-2 border-red-500'
+                  : 'bg-blue-50 border-2 border-blue-500'
+            }`}>
+              <p className={`text-center text-2xl font-bold ${
+                moodTrend === 'improving' 
+                  ? 'text-green-700' 
+                  : moodTrend === 'declining'
+                    ? 'text-red-700'
+                    : 'text-blue-700'
+              }`}>
+                {moodTrend === 'improving' && '📈 Improving'}
+                {moodTrend === 'declining' && '📉 Needs Attention'}
+                {moodTrend === 'stable' && '➡️ Stable'}
+              </p>
+              <p className={`text-center text-sm mt-2 ${
+                moodTrend === 'improving' 
+                  ? 'text-green-600' 
+                  : moodTrend === 'declining'
+                    ? 'text-red-600'
+                    : 'text-blue-600'
+              }`}>
+                {moodTrend === 'improving' && 'Your mood is trending upward - great work!'}
+                {moodTrend === 'declining' && 'Consider reaching out to your support network'}
+                {moodTrend === 'stable' && 'Your mood has been consistent'}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Category Breakdown */}
+        <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-3xl shadow-lg border ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+          <h3 className={`font-bold text-xl mb-6 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Activity Breakdown</h3>
+          <div className="space-y-4">
+            {categories.map(category => {
+              const Icon = category.icon;
+              const percentage = totalEntries > 0 ? (category.count / totalEntries * 100) : 0;
+              
+              return (
+                <div key={category.name}>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Icon className={`w-5 h-5 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`} />
+                      <span className={`font-semibold ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>{category.name}</span>
+                    </div>
+                    <span className={`font-bold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{category.count}</span>
+                  </div>
+                  <div className={`w-full ${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded-full h-3 overflow-hidden`}>
+                    <div 
+                      className={`h-full bg-gradient-to-r ${category.color} transition-all duration-500 rounded-full`}
+                      style={{ width: `${percentage}%` }}
+                    ></div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Activity Over Time */}
+        <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-3xl shadow-lg border ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+          <h3 className={`font-bold text-xl mb-6 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Activity Over Time (Last 6 Months)</h3>
+          <div className="space-y-3">
+            {activityData.length === 0 ? (
+              <p className={`text-center py-8 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>No activity data yet</p>
+            ) : (
+              activityData.map(([month, count]) => {
+                const barWidth = (count / maxActivity) * 100;
+                const [year, monthNum] = month.split('-');
+                const monthName = new Date(year, parseInt(monthNum) - 1).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                
+                return (
+                  <div key={month}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className={`text-sm font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>{monthName}</span>
+                      <span className={`text-sm font-bold ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>{count}</span>
+                    </div>
+                    <div className={`w-full ${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded-full h-8 overflow-hidden`}>
+                      <div 
+                        className="h-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-end pr-2 transition-all duration-500"
+                        style={{ width: `${barWidth}%` }}
+                      >
+                        {barWidth > 15 && <span className="text-white text-xs font-bold">{count}</span>}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        {/* Milestones Progress */}
+        <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-3xl shadow-lg border ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+          <h3 className={`font-bold text-xl mb-6 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Milestone Progress</h3>
+          <div className="space-y-4">
+            {[
+              { days: 7, label: '1 Week', achieved: daysSober >= 7 },
+              { days: 30, label: '30 Days', achieved: daysSober >= 30 },
+              { days: 90, label: '90 Days', achieved: daysSober >= 90 },
+              { days: 180, label: '6 Months', achieved: daysSober >= 180 },
+              { days: 365, label: '1 Year', achieved: daysSober >= 365 }
+            ].map(milestone => (
+              <div key={milestone.days} className="flex items-center gap-4">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  milestone.achieved 
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-600' 
+                    : darkMode
+                      ? 'bg-gray-700'
+                      : 'bg-gray-200'
+                }`}>
+                  {milestone.achieved ? (
+                    <CheckCircle className="w-6 h-6 text-white" />
+                  ) : (
+                    <div className={`w-3 h-3 ${darkMode ? 'bg-gray-500' : 'bg-white'} rounded-full`}></div>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <p className={`font-semibold ${milestone.achieved ? (darkMode ? 'text-white' : 'text-gray-800') : (darkMode ? 'text-gray-500' : 'text-gray-400')}`}>
+                    {milestone.label}
+                  </p>
+                  {!milestone.achieved && (
+                    <p className={`text-xs ${darkMode ? 'text-gray-600' : 'text-gray-500'}`}>
+                      {milestone.days - daysSober} days to go
+                    </p>
+                  )}
+                </div>
+                {milestone.achieved && (
+                  <Award className="w-6 h-6 text-amber-500" />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const HomeTab = () => (
+    <div className="space-y-6 pb-24">
+      {/* Dark Mode Toggle */}
+      <div className={`${darkMode ? 'bg-gray-800' : 'bg-white/80'} backdrop-blur-sm p-4 rounded-3xl shadow-lg border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {darkMode ? <Moon className="w-6 h-6 text-purple-400" /> : <Sun className="w-6 h-6 text-amber-500" />}
+            <span className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+              {darkMode ? 'Dark Mode' : 'Light Mode'}
+            </span>
+          </div>
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className={`relative w-16 h-8 rounded-full transition-colors ${darkMode ? 'bg-purple-600' : 'bg-gray-300'}`}
+          >
+            <div className={`absolute top-1 left-1 w-6 h-6 rounded-full bg-white transition-transform ${darkMode ? 'translate-x-8' : ''}`}></div>
+          </button>
+        </div>
+      </div>
+
+      {/* Emergency Button */}
+      <button
+        onClick={() => setShowEmergencyModal(true)}
+        className="w-full bg-gradient-to-r from-red-600 to-rose-600 text-white py-5 rounded-3xl flex items-center justify-center gap-3 hover:from-red-700 hover:to-rose-700 font-bold shadow-2xl hover:shadow-red-500/50 transition-all transform hover:scale-105 text-lg"
+      >
+        <LifeBuoy className="w-7 h-7" />
+        Emergency Support
+      </button>
+
+      {/* Relapse Prevention Plan Button */}
+      <button
+        onClick={() => setShowPlanModal(true)}
+        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-5 rounded-3xl flex items-center justify-center gap-3 hover:from-blue-700 hover:to-purple-700 font-bold shadow-2xl hover:shadow-purple-500/50 transition-all transform hover:scale-105 text-lg"
+      >
+        <Shield className="w-7 h-7" />
+        My Prevention Plan
+      </button>
+
+      {/* Export/Import Section */}
+      <div className={`${darkMode ? 'bg-gray-800' : 'bg-white/80'} backdrop-blur-sm p-4 rounded-3xl shadow-lg border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+        <div className="flex gap-3">
+          <button
+            onClick={exportData}
+            className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-3 rounded-2xl flex items-center justify-center gap-2 hover:from-blue-700 hover:to-cyan-700 font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+          >
+            <Download className="w-5 h-5" />
+            Export
+          </button>
+          <label className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-2xl flex items-center justify-center gap-2 hover:from-purple-700 hover:to-pink-700 font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105 cursor-pointer">
+            <Upload className="w-5 h-5" />
+            Import
+            <input
+              type="file"
+              accept=".json"
+              onChange={importData}
+              className="hidden"
+            />
+          </label>
+        </div>
+      </div>
+
+      <div className={`relative overflow-hidden bg-gradient-to-br ${milestone.gradient} text-white p-10 rounded-3xl shadow-2xl ${milestone.glow}`}>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full -ml-24 -mb-24"></div>
+        <div className="relative text-center">
+          <div className="bg-white/20 backdrop-blur-lg rounded-full w-32 h-32 mx-auto mb-6 flex items-center justify-center shadow-2xl">
+            <Award className="w-16 h-16 drop-shadow-lg" />
+          </div>
+          <h2 className="text-7xl font-black mb-3 drop-shadow-lg">{daysSober}</h2>
+          <p className="text-2xl font-light mb-4 opacity-95">Days Strong</p>
+          <div className="inline-block px-6 py-3 bg-white/30 backdrop-blur-md rounded-full shadow-lg">
+            <p className="font-bold text-white text-lg tracking-wide">{milestone.text}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className={`relative ${darkMode ? 'bg-gradient-to-br from-purple-900 to-pink-900' : 'bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50'} p-6 rounded-3xl shadow-lg border-2 ${darkMode ? 'border-purple-700' : 'border-amber-200/50'}`}>
+        <Sparkles className={`absolute top-4 right-4 w-6 h-6 ${darkMode ? 'text-purple-400' : 'text-amber-400'}`} />
+        <p className={`${darkMode ? 'text-purple-100' : 'text-gray-800'} italic text-lg leading-relaxed font-medium`}>"{currentQuote}"</p>
+      </div>
+
+      <div className={`${darkMode ? 'bg-gray-800' : 'bg-white/80'} backdrop-blur-sm p-6 rounded-3xl shadow-lg border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+        <h3 className={`font-bold text-xl mb-4 flex items-center gap-3 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+          <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-2 rounded-xl">
+            <Calendar className="w-5 h-5 text-white" />
+          </div>
+          Sobriety Date
+        </h3>
+        <input
+          type="date"
+          value={sobrietyDate}
+          onChange={(e) => setSobrietyDate(e.target.value)}
+          className={`w-full p-4 border-2 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-medium ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 hover:bg-white'}`}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="group bg-gradient-to-br from-green-500 to-emerald-600 p-6 rounded-3xl text-center shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 cursor-pointer">
+          <Check className="w-12 h-12 mx-auto mb-3 text-white drop-shadow-md" />
+          <p className="text-4xl font-black text-white mb-1">{getCurrentStreak()}</p>
+          <p className="text-sm text-white/90 font-semibold tracking-wide">STREAK</p>
+        </div>
+        <div className="group bg-gradient-to-br from-purple-500 to-pink-600 p-6 rounded-3xl text-center shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 cursor-pointer">
+          <Brain className="w-12 h-12 mx-auto mb-3 text-white drop-shadow-md" />
+          <p className="text-4xl font-black text-white mb-1">{getTotalMeditationMinutes()}</p>
+          <p className="text-sm text-white/90 font-semibold tracking-wide">MEDITATION</p>
+        </div>
+        <div className="group bg-gradient-to-br from-emerald-500 to-teal-600 p-6 rounded-3xl text-center shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 cursor-pointer">
+          <Users className="w-12 h-12 mx-auto mb-3 text-white drop-shadow-md" />
+          <p className="text-4xl font-black text-white mb-1">{meetings.length}</p>
+          <p className="text-sm text-white/90 font-semibold tracking-wide">MEETINGS</p>
+        </div>
+        <div className="group bg-gradient-to-br from-blue-500 to-cyan-600 p-6 rounded-3xl text-center shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 cursor-pointer">
+          <TrendingUp className="w-12 h-12 mx-auto mb-3 text-white drop-shadow-md" />
+          <p className="text-4xl font-black text-white mb-1">{growthLogs.length}</p>
+          <p className="text-sm text-white/90 font-semibold tracking-wide">GROWTH</p>
+        </div>
+      </div>
+    </div>
+  );
+
+  const CalendarTab = () => {
+    const { daysInMonth, startingDayOfWeek, year, month } = getDaysInMonth(currentMonth);
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    const prevMonth = () => {
+      setCurrentMonth(new Date(year, month - 1, 1));
+    };
+
+    const nextMonth = () => {
+      setCurrentMonth(new Date(year, month + 1, 1));
+    };
+
+    return (
+      <div className="space-y-6 pb-24">
+        <button
+          onClick={() => { setModalType('event'); setShowAddModal(true); }}
+          className="w-full bg-gradient-to-r from-slate-800 to-slate-700 text-white py-4 rounded-2xl flex items-center justify-center gap-3 hover:from-slate-900 hover:to-slate-800 font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+        >
+          <Plus className="w-6 h-6" />
+          Add Event
+        </button>
+
+        <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-3xl shadow-xl p-6 border ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+          <div className="flex justify-between items-center mb-6">
+            <button onClick={prevMonth} className={`p-3 ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} rounded-2xl transition-all`}>
+              <ChevronLeft className={`w-6 h-6 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`} />
+            </button>
+            <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>{monthNames[month]} {year}</h3>
+            <button onClick={nextMonth} className={`p-3 ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} rounded-2xl transition-all`}>
+              <ChevronRight className={`w-6 h-6 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`} />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-7 gap-2 mb-3">
+            {dayNames.map(day => (
+              <div key={day} className={`text-center text-xs font-bold py-2 uppercase tracking-wider ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                {day}
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-7 gap-2">
+            {Array.from({ length: startingDayOfWeek }).map((_, i) => (
+              <div key={`empty-${i}`} className="aspect-square"></div>
+            ))}
+            {Array.from({ length: daysInMonth }).map((_, i) => {
+              const day = i + 1;
+              const date = new Date(year, month, day);
+              const dayEvents = getEventsForDate(date);
+              const hasCheckIn = getCheckInsForDate(date).length > 0;
+              const isToday = date.toDateString() === new Date().toDateString();
+              
+              return (
+                <button
+                  key={day}
+                  onClick={() => setSelectedDate(date)}
+                  className={`aspect-square p-2 rounded-2xl text-sm font-bold relative transition-all transform hover:scale-110
+                    ${isToday 
+                      ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/50' 
+                      : dayEvents.length > 0 
+                        ? darkMode
+                          ? 'bg-gradient-to-br from-blue-900 to-cyan-900 text-blue-200 border-2 border-blue-500'
+                          : 'bg-gradient-to-br from-blue-50 to-cyan-50 text
+
+-blue-700 border-2 border-blue-300'
+                        : hasCheckIn
+                          ? darkMode
+                            ? 'bg-gradient-to-br from-green-900 to-emerald-900 text-green-200 border-2 border-green-500'
+                            : 'bg-gradient-to-br from-green-50 to-emerald-50 text-green-700 border-2 border-green-300'
+                          : darkMode
+                            ? 'hover:bg-gray-700 text-gray-300'
+                            : 'hover:bg-gray-100 text-gray-700'}
+                  `}
+                >
+                  {day}
+                  {(dayEvents.length > 0 || hasCheckIn) && (
+                    <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex gap-1">
+                      {hasCheckIn && (
+                        <div className={`w-1.5 h-1.5 rounded-full ${isToday ? 'bg-white' : 'bg-green-600'}`}></div>
+                      )}
+                      {dayEvents.slice(0, 2).map((_, idx) => (
+                        <div key={idx} className={`w-1.5 h-1.5 rounded-full ${isToday ? 'bg-white' : 'bg-blue-600'}`}></div>
+                      ))}
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {selectedDate && (
+          <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-3xl shadow-xl p-6 border ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+            <h4 className={`font-bold text-xl mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+              {selectedDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+            </h4>
+            {getEventsForDate(selectedDate).length === 0 && getCheckInsForDate(selectedDate).length === 0 ? (
+              <p className={`text-center py-6 italic ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>No events or check-ins</p>
+            ) : (
+              <div className="space-y-3">
+                {getCheckInsForDate(selectedDate).length > 0 && (
+                  <div className={`${darkMode ? 'bg-gray-700 border-green-500' : 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-600'} p-4 rounded-2xl border-l-4`}>
+                    <div className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-green-600" />
+                      <span className={`font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>Daily Check-In Completed ✓</span>
+                    </div>
+                  </div>
+                )}
+                {getEventsForDate(selectedDate).map(event => (
+                  <div key={event.id} className={`${darkMode ? 'bg-gray-700 border-blue-500' : 'bg-gradient-to-r from-blue-50 to-cyan-50 border-blue-600'} p-4 rounded-2xl border-l-4 relative group`}>
+                    <button
+                      onClick={() => deleteItem('event', event.id)}
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 hover:bg-red-600 text-white p-2 rounded-full"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    <div className="flex items-start gap-3">
+                      <div className="bg-blue-600 p-2 rounded-xl">
+                        <Clock className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h5 className={`font-bold text-lg ${darkMode ? 'text-white' : 'text-gray-800'}`}>{event.title}</h5>
+                        {event.time && <p className={`text-sm font-medium mt-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{event.time}</p>}
+                        {event.location && <p className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>{event.location}</p>}
+                        {event.description && <p className={`text-sm mt-2 italic ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{event.description}</p>}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const ContactsTab = () => (
+    <div className="space-y-6 pb-24">
+      <button
+        onClick={() => { setModalType('contact'); setShowAddModal(true); }}
+        className="w-full bg-gradient-to-r from-slate-800 to-slate-700 text-white py-4 rounded-2xl flex items-center justify-center gap-3 hover:from-slate-900 hover:to-slate-800 font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+      >
+        <Plus className="w-6 h-6" />
+        Add Contact
+      </button>
+
+      {contacts.length === 0 ? (
+        <div className={`text-center py-16 ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-3xl shadow-lg`}>
+          <div className={`${darkMode ? 'bg-gradient-to-br from-indigo-900 to-purple-900' : 'bg-gradient-to-br from-indigo-100 to-purple-100'} w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4`}>
+            <User className={`w-12 h-12 ${darkMode ? 'text-indigo-400' : 'text-indigo-600'}`} />
+          </div>
+          <p className={`text-xl font-semibold mb-1 ${darkMode ? 'text-white' : 'text-gray-800'}`}>No contacts yet</p>
+          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Add people from your support network</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {contacts.map(contact => (
+            <div key={contact.id} className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} p-6 rounded-3xl shadow-lg border hover:shadow-xl transition-all relative group`}>
+              <button
+                onClick={() => deleteItem('contact', contact.id)}
+                className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 hover:bg-red-600 text-white p-2 rounded-full"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+              <div className="flex items-start gap-4">
+                <div className="bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded-2xl w-16 h-16 flex items-center justify-center font-black text-2xl shadow-lg">
+                  {contact.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="flex-1">
+                  <h4 className={`font-bold text-xl ${darkMode ? 'text-white' : 'text-gray-800'}`}>{contact.name}</h4>
+                  {contact.role && (
+                    <span className={`inline-block ${darkMode ? 'bg-indigo-900 text-indigo-200' : 'bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700'} text-xs px-3 py-1 rounded-full mt-2 font-semibold`}>
+                      {contact.role}
+                    </span>
+                  )}
+                  <div className="mt-4 space-y-2">
+                    {contact.phone && (
+                      <div className={`flex items-center gap-3 text-sm ${darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-50 text-gray-600'} p-3 rounded-xl`}>
+                        <div className="bg-indigo-600 p-2 rounded-lg">
+                          <Phone className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <a href={`tel:${contact.phone}`} className={`hover:text-indigo-600 font-medium ${darkMode ? 'text-gray-200' : ''}`}>
+                          {contact.phone}
+                        </a>
+                      </div>
+                    )}
+                    {contact.email && (
+                      <div className={`flex items-center gap-3 text-sm ${darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-50 text-gray-600'} p-3 rounded-xl`}>
+                        <div className="bg-indigo-600 p-2 rounded-lg">
+                          <Mail className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <a href={`mailto:${contact.email}`} className={`hover:text-indigo-600 font-medium ${darkMode ? 'text-gray-200' : ''}`}>
+                          {contact.email}
+                        </a>
+                      </div>
+                    )}
+                    {contact.notes && (
+                      <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-50'} p-3 rounded-xl`}>
+                        <p className={`text-sm italic ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{contact.notes}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const JournalTab = () => {
+    const [journalView, setJournalView] = useState('meetings');
+
+    const renderJournalContent = () => {
+      switch(journalView) {
+        case 'meetings':
+          return (
+            <div className="space-y-4">
+              <button
+                onClick={() => { setModalType('meeting'); setShowAddModal(true); }}
+                className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-4 rounded-2xl flex items-center justify-center gap-3 hover:from-emerald-700 hover:to-teal-700 font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+              >
+                <Plus className="w-6 h-6" />
+                Add Meeting
+              </button>
+              {meetings.length === 0 ? (
+                <div className={`text-center py-16 ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-3xl shadow-lg`}>
+                  <Users className={`w-16 h-16 mx-auto mb-4 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
+                  <p className={`text-xl font-semibold mb-1 ${darkMode ? 'text-white' : 'text-gray-800'}`}>No meetings logged</p>
+                  <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Start tracking your recovery meetings</p>
+                </div>
+              ) : (
+                meetings.map(meeting => (
+                  <div key={meeting.id} className={`${darkMode ? 'bg-gray-800 border-emerald-500' : 'bg-white border-emerald-600'} p-6 rounded-3xl shadow-lg border-l-4 relative group`}>
+                    <button
+                      onClick={() => deleteItem('meeting', meeting.id)}
+                      className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 hover:bg-red-600 text-white p-2 rounded-full"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    <h4 className={`font-bold text-xl mb-2 ${darkMode ? 'text-white' : 'text-gray-800'}`}>{meeting.name}</h4>
+                    <p className={`text-sm mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{meeting.location}</p>
+                    {meeting.notes && <p className={`text-sm italic mt-3 ${darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-50 text-gray-500'} p-3 rounded-xl`}>{meeting.notes}</p>}
+                    <p className={`text-xs mt-3 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>{new Date(meeting.date).toLocaleDateString()}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          );
+
+        case 'growth':
+          return (
+            <div className="space-y-4">
+              <button
+                onClick={() => { setModalType('growth'); setShowAddModal(true); }}
+                className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-4 rounded-2xl flex items-center justify-center gap-3 hover:from-blue-700 hover:to-cyan-700 font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+              >
+                <Plus className="w-6 h-6" />
+                Add Growth Log
+              </button>
+              {growthLogs.length === 0 ? (
+                <div className={`text-center py-16 ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-3xl shadow-lg`}>
+                  <TrendingUp className={`w-16 h-16 mx-auto mb-4 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+                  <p className={`text-xl font-semibold mb-1 ${darkMode ? 'text-white' : 'text-gray-800'}`}>No growth logs yet</p>
+                  <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Document your personal development</p>
+                </div>
+              ) : (
+                growthLogs.map(log => (
+                  <div key={log.id} className={`${darkMode ? 'bg-gray-800 border-blue-500' : 'bg-white border-blue-600'} p-6 rounded-3xl shadow-lg border-l-4 relative group`}>
+                    <button
+                      onClick={() => deleteItem('growth', log.id)}
+                      className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 hover:bg-red-600 text-white p-2 rounded-full"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    <h4 className={`font-bold text-xl mb-3 ${darkMode ? 'text-white' : 'text-gray-800'}`}>{log.title}</h4>
+                    <p className={`leading-relaxed ${darkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-50 text-gray-600'} p-4 rounded-xl`}>{log.content}</p>
+                    <p className={`text-xs mt-3 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>{new Date(log.date).toLocaleDateString()}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          );
+
+        case 'challenges':
+          return (
+            <div className="space-y-4">
+              <button
+                onClick={() => { setModalType('challenge'); setShowAddModal(true); }}
+                className="w-full bg-gradient-to-r from-orange-600 to-amber-600 text-white py-4 rounded-2xl flex items-center justify-center gap-3 hover:from-orange-700 hover:to-amber-700 font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+              >
+                <Plus className="w-6 h-6" />
+                Add Challenge
+              </button>
+              {challenges.length === 0 ? (
+                <div className={`text-center py-16 ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-3xl shadow-lg`}>
+                  <CheckCircle className={`w-16 h-16 mx-auto mb-4 ${darkMode ? 'text-orange-400' : 'text-orange-600'}`} />
+                  <p className={`text-xl font-semibold mb-1 ${darkMode ? 'text-white' : 'text-gray-800'}`}>No challenges logged</p>
+                  <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Track how you overcome obstacles</p>
+                </div>
+              ) : (
+                challenges.map(challenge => (
+                  <div key={challenge.id} className={`${darkMode ? 'bg-gray-800 border-orange-500' : 'bg-white border-orange-600'} p-6 rounded-3xl shadow-lg border-l-4 relative group`}>
+                    <button
+                      onClick={() => deleteItem('challenge', challenge.id)}
+                      className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 hover:bg-red-600 text-white p-2 rounded-full"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    <h4 className={`font-bold text-xl mb-3 ${darkMode ? 'text-white' : 'text-gray-800'}`}>{challenge.title}</h4>
+                    <div className="space-y-3">
+                      <div className={`${darkMode ? 'bg-gray-700' : 'bg-orange-50'} p-4 rounded-xl`}>
+                        <p className={`text-xs font-bold mb-1 uppercase tracking-wide ${darkMode ? 'text-orange-400' : 'text-orange-800'}`}>Challenge</p>
+                        <p className={darkMode ? 'text-gray-200' : 'text-gray-700'}>{challenge.description}</p>
+                      </div>
+                      <div className={`${darkMode ? 'bg-gray-700' : 'bg-green-50'} p-4 rounded-xl`}>
+                        <p className={`text-xs font-bold mb-1 uppercase tracking-wide ${darkMode ? 'text-green-400' : 'text-green-800'}`}>Response</p>
+                        <p className={darkMode ? 'text-gray-200' : 'text-gray-700'}>{challenge.response}</p>
+                      </div>
+                    </div>
+                    <p className={`text-xs mt-3 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>{new Date(challenge.date).toLocaleDateString()}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          );
+
+        case 'gratitude':
+          return (
+            <div className="space-y-4">
+              <button
+                onClick={() => { setModalType('gratitude'); setShowAddModal(true); }}
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-2xl flex items-center justify-center gap-3 hover:from-purple-700 hover:to-pink-700 font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+              >
+                <Plus className="w-6 h-6" />
+                Add Gratitude
+              </button>
+              {gratitude.length === 0 ? (
+                <div className={`text-center py-16 ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-3xl shadow-lg`}>
+                  <Heart className={`w-16 h-16 mx-auto mb-4 ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
+                  <p className={`text-xl font-semibold mb-1 ${darkMode ? 'text-white' : 'text-gray-800'}`}>No gratitude entries</p>
+                  <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Start your gratitude practice</p>
+                </div>
+              ) : (
+                gratitude.map(item => (
+                  <div key={item.id} className={`${darkMode ? 'bg-gray-800 border-purple-500' : 'bg-white border-purple-600'} p-6 rounded-3xl shadow-lg border-l-4 relative group`}>
+                    <button
+                      onClick={() => deleteItem('gratitude', item.id)}
+                      className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 hover:bg-red-600 text-white p-2 rounded-full"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    <Heart className={`w-8 h-8 ${darkMode ? 'text-purple-400' : 'text-purple-600'} mb-3`} />
+                    <p className={`leading-relaxed ${darkMode ? 'bg-gray-700 text-gray-200' : 'bg-purple-50 text-gray-700'} p-4 rounded-xl`}>{item.content}</p>
+                    <p className={`text-xs mt-3 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>{new Date(item.date).toLocaleDateString()}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          );
+
+        default:
+          return null;
+      }
+    };
+
+    return (
+      <div className="space-y-6 pb-24">
+        <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} rounded-3xl shadow-lg p-2 border`}>
+          <div className="grid grid-cols-4 gap-2">
+            {[
+              { id: 'meetings', label: 'Meetings', icon: Users, color: 'emerald' },
+              { id: 'growth', label: 'Growth', icon: TrendingUp, color: 'blue' },
+              { id: 'challenges', label: 'Challenges', icon: CheckCircle, color: 'orange' },
+              { id: 'gratitude', label: 'Gratitude', icon: Heart, color: 'purple' }
+            ].map(tab => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setJournalView(tab.id)}
+                  className={`py-3 px-2 rounded-2xl font-semibold text-xs transition-all ${
+                    journalView === tab.id
+                      ? `bg-gradient-to-r from-${tab.color}-600 to-${tab.color}-700 text-white shadow-lg`
+                      : darkMode
+                        ? 'text-gray-400 hover:bg-gray-700'
+                        : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <Icon className="w-5 h-5 mx-auto mb-1" />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {renderJournalContent()}
+      </div>
+    );
+  };
+
+  return (
+    <div className={`min-h-screen ${darkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50'} transition-colors duration-300`}>
+      <NotificationPanel />
+      
+      <div className="max-w-2xl mx-auto p-6">
+        <div className="mb-8 text-center">
+          <h1 className={`text-5xl font-black mb-2 ${darkMode ? 'bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent' : 'bg-gradient-to-r from-slate-800 via-blue-800 to-indigo-800 bg-clip-text text-transparent'}`}>
+            Recovery Journey
+          </h1>
+          <p className={`font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Your path to a healthier life</p>
+        </div>
+
+        {activeTab === 'home' && <HomeTab />}
+        {activeTab === 'checkin' && <CheckInTab />}
+        {activeTab === 'cravings' && <CravingsTab />}
+        {activeTab === 'meditation' && <MeditationTab />}
+        {activeTab === 'calendar' && <CalendarTab />}
+        {activeTab === 'journal' && <JournalTab />}
+        {activeTab === 'contacts' && <ContactsTab />}
+        {activeTab === 'analytics' && <AnalyticsTab />}
+
+        {showAddModal && <AddModal />}
+        {showEmergencyModal && <EmergencyModal />}
+        {showPlanModal && <RelapsePlanModal />}
+        {showMeditationTimer && <MeditationTimer />}
+
+        <div className={`fixed bottom-0 left-0 right-0 ${darkMode ? 'bg-gray-900/95' : 'bg-white/95'} backdrop-blur-lg border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'} shadow-2xl`}>
+          <div className="max-w-2xl mx-auto px-2 py-2">
+            <div className="flex justify-around items-center">
+              {[
+                { id: 'home', icon: Award, label: 'Home' },
+                { id: 'checkin', icon: Check, label: 'Check-In' },
+                { id: 'cravings', icon: AlertCircle, label: 'Cravings' },
+                { id: 'meditation', icon: Brain, label: 'Meditate' },
+                { id: 'calendar', icon: Calendar, label: 'Calendar' },
+                { id: 'journal', icon: TrendingUp, label: 'Journal' },
+                { id: 'contacts', icon: Users, label: 'Contacts' },
+                { id: 'analytics', icon: BarChart3, label: 'Stats' }
+              ].map(tab => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex flex-col items-center gap-1 px-2 py-2 rounded-2xl transition-all ${
+                      activeTab === tab.id
+                        ? darkMode
+                          ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg scale-110'
+                          : 'bg-gradient-to-r from-slate-800 to-slate-700 text-white shadow-lg scale-110'
+                        : darkMode
+                          ? 'text-gray-400 hover:bg-gray-800'
+                          : 'text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" />
+                    <span className="text-xs font-bold">{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideUp {
+          from { transform: translateY(20px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes slideIn {
+          from { transform: translateX(100px); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.2s ease-out;
+        }
+        .animate-slideUp {
+          animation: slideUp 0.3s ease-out;
+        }
+        .animate-slideIn {
+          animation: slideIn 0.3s ease-out;
+        }
+      `}</style>
+    </div>
+  );
+}
+
