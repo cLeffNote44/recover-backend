@@ -226,6 +226,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
     loadData();
   }, [loadData]);
 
+  // Initialize clean period if none exists
+  useEffect(() => {
+    if (!loading && cleanPeriods.length === 0 && sobrietyDate) {
+      // Create initial clean period starting from sobriety date
+      const initialCleanPeriod: CleanPeriod = {
+        id: Date.now(),
+        startDate: sobrietyDate,
+        daysClean: 0,
+        notes: 'Initial recovery period'
+      };
+      setCleanPeriods([initialCleanPeriod]);
+    }
+  }, [loading, cleanPeriods.length, sobrietyDate]);
+
   // Save data whenever it changes
   useEffect(() => {
     if (!loading) {
