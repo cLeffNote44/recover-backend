@@ -17,6 +17,7 @@ import { celebrate } from '@/lib/celebrations';
 import { calculateBadgeProgress, getRecentlyEarnedBadges, getBadgeTierColor } from '@/lib/badges';
 import { predictRelapseRisk } from '@/lib/relapse-risk-prediction';
 import { RiskPredictionCard } from '../RiskPredictionCard';
+import { InsightCards } from '../InsightCards';
 import type { HALTCheck as HALTCheckType } from '@/types/app';
 import { toast } from 'sonner';
 
@@ -41,6 +42,9 @@ export function HomeScreen() {
     reasonsForSobriety,
     celebrationsEnabled,
     cleanPeriods,
+    sleepEntries,
+    exerciseEntries,
+    relapses,
     loading
   } = useAppContext();
 
@@ -350,6 +354,16 @@ export function HomeScreen() {
       {riskPrediction && riskPrediction.riskLevel !== 'low' && (
         <RiskPredictionCard prediction={riskPrediction} />
       )}
+
+      {/* Pattern Insights */}
+      <InsightCards
+        cravings={cravings}
+        checkIns={checkIns}
+        meetings={meetings}
+        sleepEntries={sleepEntries}
+        exerciseEntries={exerciseEntries}
+        relapses={relapses}
+      />
 
       {/* Cost Savings */}
       {costPerDay > 0 && (
