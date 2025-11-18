@@ -9,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
-import { EmptyState } from '@/components/EmptyState';
 import { Moon, Pill, Dumbbell, Apple, Plus, Trash2, Clock, Calendar } from 'lucide-react';
 import { formatDate } from '@/lib/utils-app';
 import { toast } from 'sonner';
