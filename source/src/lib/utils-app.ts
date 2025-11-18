@@ -1,4 +1,4 @@
-import { CheckIn, Badge, SleepEntry, ExerciseEntry, NutritionEntry, Craving, Relapse, CleanPeriod, AppData } from '@/types/app';
+import { CheckIn, Badge, SleepEntry, ExerciseEntry, NutritionEntry, Craving, Relapse, CleanPeriod, AppData, TWELVE_STEPS } from '@/types/app';
 
 export function calculateDaysSober(sobrietyDate: string): number {
   const start = new Date(sobrietyDate);
@@ -886,7 +886,19 @@ export function importBackup(
         exerciseEntries: importedData.exerciseEntries || [],
         nutritionEntries: importedData.nutritionEntries || [],
         relapses: importedData.relapses || [],
-        cleanPeriods: importedData.cleanPeriods || []
+        cleanPeriods: importedData.cleanPeriods || [],
+        stepWork: importedData.stepWork || {
+          currentStep: 1,
+          steps: TWELVE_STEPS.map((step) => ({
+            stepNumber: step.number,
+            status: 'not-started' as const,
+            notes: '',
+            reflections: [],
+            exercises: []
+          })),
+          sponsorNotes: '',
+          lastReviewDate: undefined
+        }
       };
 
       onSuccess(safeData);
