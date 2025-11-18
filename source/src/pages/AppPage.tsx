@@ -4,6 +4,7 @@ import { BottomNav } from '@/components/app/BottomNav';
 import { Button } from '@/components/ui/button';
 import { AlertCircle } from 'lucide-react';
 import { EmergencySupportModal } from '@/components/app/EmergencySupportModal';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 // Lazy load screen components for better performance
 const HomeScreen = lazy(() => import('@/components/app/screens/HomeScreen').then(m => ({ default: m.HomeScreen })));
@@ -59,24 +60,26 @@ function AppContent() {
         role="main"
         aria-label="Main content"
       >
-        <Suspense fallback={
-          <div className="flex items-center justify-center py-12">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-sm text-muted-foreground">Loading...</p>
+        <ErrorBoundary>
+          <Suspense fallback={
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                <p className="text-sm text-muted-foreground">Loading...</p>
+              </div>
             </div>
-          </div>
-        }>
-          {activeTab === 'home' && <HomeScreen />}
-          {activeTab === 'calendar' && <CalendarScreen />}
-          {activeTab === 'journal' && <JournalScreen />}
-          {activeTab === 'contacts' && <ContactsScreen />}
-          {activeTab === 'goals' && <GoalsScreen />}
-          {activeTab === 'prevention' && <PreventionScreen />}
-          {activeTab === 'wellness' && <WellnessScreen />}
-          {activeTab === 'recovery' && <RelapseTrackerScreen />}
-          {activeTab === 'settings' && <SettingsScreen />}
-        </Suspense>
+          }>
+            {activeTab === 'home' && <HomeScreen />}
+            {activeTab === 'calendar' && <CalendarScreen />}
+            {activeTab === 'journal' && <JournalScreen />}
+            {activeTab === 'contacts' && <ContactsScreen />}
+            {activeTab === 'goals' && <GoalsScreen />}
+            {activeTab === 'prevention' && <PreventionScreen />}
+            {activeTab === 'wellness' && <WellnessScreen />}
+            {activeTab === 'recovery' && <RelapseTrackerScreen />}
+            {activeTab === 'settings' && <SettingsScreen />}
+          </Suspense>
+        </ErrorBoundary>
       </main>
 
       {/* Bottom Navigation */}
