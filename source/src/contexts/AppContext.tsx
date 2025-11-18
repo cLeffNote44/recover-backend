@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef, ReactNode } from 'react';
 import { AppData, CheckIn, Meeting, GrowthLog, Challenge, Gratitude, Contact, CalendarEvent, Craving, Meditation, RelapsePlan, ReasonForSobriety, NotificationSettings, Goal, GoalProgress, Quote, QuoteSettings, SkillBuilding, UserProfile, SleepEntry, Medication, MedicationLog, ExerciseEntry, NutritionEntry, Relapse, CleanPeriod, StepWorkProgress, StepWorkEntry, TWELVE_STEPS } from '@/types/app';
 import { MOTIVATIONAL_QUOTES } from '@/lib/constants';
 import { initializeNotifications } from '@/lib/notifications';
@@ -115,6 +115,7 @@ const defaultStepWork: StepWorkProgress = {
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
+  const cleanPeriodsInitialized = useRef(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [sobrietyDate, setSobrietyDate] = useState(new Date().toISOString().split('T')[0]);
   const [checkIns, setCheckIns] = useState<CheckIn[]>([]);
@@ -228,17 +229,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // Initialize clean period if none exists
   useEffect(() => {
-    if (!loading && cleanPeriods.length === 0 && sobrietyDate) {
-      // Create initial clean period starting from sobriety date
-      const initialCleanPeriod: CleanPeriod = {
-        id: Date.now(),
-        startDate: sobrietyDate,
-        daysClean: 0,
-        notes: 'Initial recovery period'
-      };
-      setCleanPeriods([initialCleanPeriod]);
+    if (!loading && sobrietyDate && !cleanPeriodsInitialized.current) {
+      // Only run this once after loading completes
+      if (cleanPeriods.length === 0) {
+        // Create initial clean period starting from sobriety date
+        const initialCleanPeriod: CleanPeriod = {
+          id: Date.now(),
+          startDate: sobrietyDate,
+          daysClean: 0,
+          notes: 'Initial recovery period'
+        };
+        setCleanPeriods([initialCleanPeriod]);
+        cleanPeriodsInitialized.current = true;
+      }
     }
-  }, [loading, cleanPeriods.length, sobrietyDate]);
+  }, [loading, sobrietyDate, cleanPeriods.length]);
 
   // Save data whenever it changes
   useEffect(() => {
