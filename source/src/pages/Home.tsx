@@ -275,6 +275,9 @@ export default function Home() {
           <p className="mb-2">Recover v5.0 - Built with ❤️ for the recovery community</p>
           <p>Not a substitute for professional treatment. Consult healthcare providers for serious issues.</p>
           <p className="mt-4">Crisis Support: <strong className="text-purple-400">988 Suicide & Crisis Lifeline</strong></p>
+          <Link href="/privacy">
+            <span className="text-purple-400 hover:text-purple-300 cursor-pointer mt-4 inline-block">Privacy Policy</span>
+          </Link>
         </div>
       </div>
     </div>

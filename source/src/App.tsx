@@ -8,6 +8,7 @@ import { useAppContext, AppProvider } from "./contexts/AppContext";
 import Home from "./pages/Home";
 import AppPage from "./pages/AppPage";
 import Onboarding from "./pages/Onboarding";
+import Privacy from "./pages/Privacy";
 import { LockScreen } from "./components/LockScreen";
 import { biometricAuthManager } from "./lib/biometric-auth";
 import { App as CapacitorApp } from '@capacitor/app';
@@ -37,6 +38,7 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/onboarding"} component={Onboarding} />
+      <Route path={"/privacy"} component={Privacy} />
       <Route path={"/app"}>
         {() => <ProtectedRoute component={AppPage} />}
       </Route>

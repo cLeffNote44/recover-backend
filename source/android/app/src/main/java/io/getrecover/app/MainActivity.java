@@ -1,4 +1,4 @@
-package com.recovery.journey;
+package io.getrecover.app;
 
 import com.getcapacitor.BridgeActivity;
 

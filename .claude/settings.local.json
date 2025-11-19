@@ -15,7 +15,13 @@
       "Bash(git rm:*)",
       "Bash(git rebase:*)",
       "Bash(pnpm run build:*)",
-      "Bash(npx cap:*)"
+      "Bash(npx cap:*)",
+      "Bash(gh api:*)",
+      "Bash(npx vercel --prod --yes)",
+      "Bash(cat:*)",
+      "Bash(npx vercel link:*)",
+      "Bash(npx vercel inspect:*)",
+      "Bash(keytool:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.recovery.journey',
+  appId: 'io.getrecover.app',
   appName: 'Recover',
   webDir: 'dist',
   server: {

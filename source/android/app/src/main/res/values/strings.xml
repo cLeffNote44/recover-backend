@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">Recover</string>
     <string name="title_activity_main">Recover</string>
-    <string name="package_name">com.recovery.journey</string>
-    <string name="custom_url_scheme">com.recovery.journey</string>
+    <string name="package_name">io.getrecover.app</string>
+    <string name="custom_url_scheme">io.getrecover.app</string>
 </resources>
