@@ -1,5 +1,5 @@
 import { forwardRef, useMemo } from 'react';
-import { calculateDaysSober, calculateStreak, getMilestone, calculateTotalSavings } from '@/lib/utils-app';
+import { calculateDaysSober, calculateStreak, getMilestone, calculateTotalSavings } from '@/lib/utils';
 import { BADGES } from '@/lib/constants';
 import type { AppData } from '@/types/app';
 import { ReportOptions, getDateRangeDescription, filterByDateRange } from '@/lib/pdf-generator';

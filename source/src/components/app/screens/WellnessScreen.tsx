@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppData } from '@/hooks/useAppData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,7 @@ import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
 import { EmptyState } from '@/components/EmptyState';
 import { Moon, Pill, Dumbbell, Apple, Plus, Trash2, Clock, Calendar } from 'lucide-react';
-import { formatDate } from '@/lib/utils-app';
+import { formatDate } from '@/lib/utils';
 import { toast } from 'sonner';
 import type { SleepEntry, Medication, MedicationLog, ExerciseEntry, NutritionEntry } from '@/types/app';
 
@@ -33,7 +33,7 @@ export function WellnessScreen() {
     nutritionEntries,
     setNutritionEntries,
     loading
-  } = useAppContext();
+  } = useAppData();
 
   const [activeTab, setActiveTab] = useState('sleep');
 

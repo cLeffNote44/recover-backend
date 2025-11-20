@@ -66,8 +66,8 @@ Add these scripts and config:
     "electron:build:linux": "electron-builder --linux"
   },
   "build": {
-    "appId": "com.recoveryjourney.app",
-    "productName": "Recovery Journey",
+    "appId": "io.getrecover.app",
+    "productName": "Recover",
     "files": [
       "dist/**/*",
       "electron.js"

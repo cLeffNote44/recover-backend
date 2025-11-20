@@ -4,7 +4,7 @@ import { OnboardingStep } from '@/components/OnboardingStep';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppData } from '@/hooks/useAppData';
 import { requestNotificationPermission, isNative } from '@/lib/notifications';
 import {
   Award, Bell, Calendar, Heart, Shield, Sparkles, User, Clock, Brain, TrendingUp, Zap
@@ -20,7 +20,7 @@ export default function Onboarding() {
     setOnboardingCompleted,
     notificationSettings,
     contacts,
-  } = useAppContext();
+  } = useAppData();
 
   const [currentStep, setCurrentStep] = useState(1);
   const [userName, setUserName] = useState('');

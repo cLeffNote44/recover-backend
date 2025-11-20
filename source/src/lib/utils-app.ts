@@ -1053,3 +1053,117 @@ export function isBackupReminderDismissed(): boolean {
   }
 }
 
+/**
+ * Calculate how many days were clean before a relapse
+ *
+ * Finds the most recent clean period before the relapse date and calculates
+ * the number of days from the start of that period to the relapse.
+ *
+ * @param relapseDate - The date of the relapse (YYYY-MM-DD)
+ * @param cleanPeriods - Array of clean periods
+ * @param sobrietyDate - Original sobriety date as fallback
+ * @returns Number of days clean before the relapse
+ */
+export function calculateDaysCleanBefore(
+  relapseDate: string,
+  cleanPeriods: CleanPeriod[],
+  sobrietyDate: string
+): number {
+  const mostRecentPeriod = cleanPeriods
+    .filter(p => !p.endDate || p.endDate <= relapseDate)
+    .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())[0];
+
+  if (!mostRecentPeriod) {
+    return calculateDaysSober(sobrietyDate);
+  }
+
+  const start = new Date(mostRecentPeriod.startDate);
+  const end = new Date(relapseDate);
+  return Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+/**
+ * Create a relapse entry object from form data
+ *
+ * @param formData - Relapse form data
+ * @param daysCleanBefore - Number of days clean before this relapse
+ * @returns Complete relapse object
+ */
+export function createRelapseEntry(
+  formData: {
+    date: string;
+    time?: string;
+    substance?: string;
+    triggers: string;
+    circumstances: string;
+    emotions: string;
+    thoughts: string;
+    consequences: string;
+    lessonsLearned: string;
+    preventionPlan: string;
+    supportUsed: string;
+    severity: 'minor' | 'moderate' | 'severe';
+    isPrivate: boolean;
+  },
+  daysCleanBefore: number
+): Relapse {
+  return {
+    id: Date.now(),
+    date: formData.date,
+    time: formData.time || undefined,
+    substance: formData.substance || undefined,
+    triggers: formData.triggers,
+    circumstances: formData.circumstances,
+    emotions: formData.emotions,
+    thoughts: formData.thoughts,
+    consequences: formData.consequences,
+    lessonsLearned: formData.lessonsLearned,
+    preventionPlan: formData.preventionPlan,
+    supportUsed: formData.supportUsed,
+    severity: formData.severity,
+    daysCleanBefore,
+    isPrivate: formData.isPrivate
+  };
+}
+
+/**
+ * Process the impact of a relapse on clean periods
+ *
+ * Ends the current clean period at the relapse date and creates a new clean period
+ * starting the day after the relapse.
+ *
+ * @param relapseDate - The date of the relapse (YYYY-MM-DD)
+ * @param relapseId - ID of the relapse entry
+ * @param cleanPeriods - Current array of clean periods
+ * @returns Updated array of clean periods
+ */
+export function processRelapseImpact(
+  relapseDate: string,
+  relapseId: number,
+  cleanPeriods: CleanPeriod[]
+): CleanPeriod[] {
+  const updatedPeriods = [...cleanPeriods];
+
+  // End the current clean period
+  const currentPeriod = updatedPeriods.find(p => !p.endDate);
+  if (currentPeriod) {
+    const index = updatedPeriods.findIndex(p => p.id === currentPeriod.id);
+    updatedPeriods[index] = {
+      ...currentPeriod,
+      endDate: relapseDate,
+      relapseId
+    };
+  }
+
+  // Start a new clean period from tomorrow
+  const tomorrow = new Date(relapseDate);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const newPeriod: CleanPeriod = {
+    id: Date.now() + 1,
+    startDate: tomorrow.toISOString().split('T')[0]!
+  };
+  updatedPeriods.push(newPeriod);
+
+  return updatedPeriods;
+}
+

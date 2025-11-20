@@ -7,7 +7,7 @@
 
 import { useState, useMemo } from 'react';
 import { X, Mail, Download, Copy, Check, Share2, Calendar, User, Shield, FileText } from 'lucide-react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppData } from '@/hooks/useAppData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -31,7 +31,7 @@ interface ProgressSharingModalProps {
 }
 
 export function ProgressSharingModal({ isOpen, onClose }: ProgressSharingModalProps) {
-  const context = useAppContext();
+  const context = useAppData();
   const [period, setPeriod] = useState<'week' | 'month' | 'custom'>('week');
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');

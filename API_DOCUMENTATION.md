@@ -1,4 +1,4 @@
-# Recovery Journey - API Documentation
+# Recover - API Documentation
 
 ## Table of Contents
 
@@ -253,7 +253,7 @@ const url = URL.createObjectURL(blob);
 {
   "version": "1.0.0",
   "exportDate": "2024-01-01T00:00:00.000Z",
-  "appName": "Recovery Journey",
+  "appName": "Recover",
   "data": { /* AppData */ }
 }
 ```

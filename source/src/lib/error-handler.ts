@@ -20,7 +20,7 @@ export interface AppError {
   technical: string;
   timestamp: Date;
   stack?: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   recoverable: boolean;
   retryable: boolean;
 }
@@ -33,7 +33,7 @@ export function createError(
   message: string,
   userMessage: string,
   technical: string,
-  context?: Record<string, any>
+  context?: Record<string, unknown>
 ): AppError {
   return {
     type,
@@ -96,9 +96,22 @@ export function logError(error: AppError): void {
 }
 
 /**
+ * Toast interface for error messages
+ */
+export interface ToastInterface {
+  error: (message: string, options?: {
+    duration?: number;
+    action?: {
+      label: string;
+      onClick: () => void;
+    };
+  }) => void;
+}
+
+/**
  * Show user-friendly error message
  */
-export function showError(error: AppError, toast?: any): void {
+export function showError(error: AppError, toast?: ToastInterface): void {
   logError(error);
 
   if (toast) {
@@ -108,7 +121,6 @@ export function showError(error: AppError, toast?: any): void {
         label: 'Retry',
         onClick: () => {
           // Retry logic would be implemented by caller
-          console.log('Retry requested');
         }
       } : undefined
     });
@@ -121,8 +133,8 @@ export function showError(error: AppError, toast?: any): void {
 /**
  * Handle storage errors
  */
-export function handleStorageError(error: any, context?: Record<string, any>): AppError {
-  const technical = error?.message || String(error);
+export function handleStorageError(error: unknown, context?: Record<string, unknown>): AppError {
+  const technical = error instanceof Error ? error.message : String(error);
 
   let userMessage = 'Unable to save your data.';
   if (technical.includes('quota') || technical.includes('full')) {
@@ -141,8 +153,8 @@ export function handleStorageError(error: any, context?: Record<string, any>): A
 /**
  * Handle network errors
  */
-export function handleNetworkError(error: any, context?: Record<string, any>): AppError {
-  const technical = error?.message || String(error);
+export function handleNetworkError(error: unknown, context?: Record<string, unknown>): AppError {
+  const technical = error instanceof Error ? error.message : String(error);
 
   return createError(
     ErrorType.NETWORK,
@@ -159,7 +171,7 @@ export function handleNetworkError(error: any, context?: Record<string, any>): A
 export function handleValidationError(
   field: string,
   reason: string,
-  context?: Record<string, any>
+  context?: Record<string, unknown>
 ): AppError {
   return createError(
     ErrorType.VALIDATION,
@@ -173,7 +185,7 @@ export function handleValidationError(
 /**
  * Handle authentication errors
  */
-export function handleAuthError(context?: Record<string, any>): AppError {
+export function handleAuthError(context?: Record<string, unknown>): AppError {
   return createError(
     ErrorType.AUTHENTICATION,
     'Authentication failed',
@@ -186,7 +198,7 @@ export function handleAuthError(context?: Record<string, any>): AppError {
 /**
  * Handle permission errors
  */
-export function handlePermissionError(permission: string, context?: Record<string, any>): AppError {
+export function handlePermissionError(permission: string, context?: Record<string, unknown>): AppError {
   return createError(
     ErrorType.PERMISSION,
     `Permission denied: ${permission}`,
@@ -199,8 +211,8 @@ export function handlePermissionError(permission: string, context?: Record<strin
 /**
  * Handle unknown errors
  */
-export function handleUnknownError(error: any, context?: Record<string, any>): AppError {
-  const technical = error?.message || String(error);
+export function handleUnknownError(error: unknown, context?: Record<string, unknown>): AppError {
+  const technical = error instanceof Error ? error.message : String(error);
 
   return createError(
     ErrorType.UNKNOWN,
@@ -219,7 +231,7 @@ export async function retryWithBackoff<T>(
   maxRetries: number = 3,
   baseDelay: number = 1000
 ): Promise<T> {
-  let lastError: any;
+  let lastError: unknown;
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
@@ -229,7 +241,6 @@ export async function retryWithBackoff<T>(
 
       if (attempt < maxRetries - 1) {
         const delay = baseDelay * Math.pow(2, attempt);
-        console.log(`Retry attempt ${attempt + 1}/${maxRetries} after ${delay}ms`);
         await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
@@ -243,12 +254,12 @@ export async function retryWithBackoff<T>(
  */
 export async function safeAsync<T>(
   fn: () => Promise<T>,
-  errorHandler: (error: any) => AppError,
+  errorHandler: (error: unknown) => AppError,
   options?: {
     retry?: boolean;
     maxRetries?: number;
     showError?: boolean;
-    toast?: any;
+    toast?: ToastInterface;
   }
 ): Promise<{ success: boolean; data?: T; error?: AppError }> {
   try {
@@ -310,8 +321,9 @@ export function setupGlobalErrorHandler(): void {
     logError(error);
 
     // Show user-friendly message
-    if ((window as any).toast) {
-      (window as any).toast.error(error.userMessage);
+    const globalToast = (window as { toast?: ToastInterface }).toast;
+    if (globalToast) {
+      globalToast.error(error.userMessage);
     }
   });
 

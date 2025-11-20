@@ -15,6 +15,7 @@ import {
   type BiometricAvailability
 } from '@/lib/biometric-auth';
 import { toast } from 'sonner';
+import { pinSchema, validateForm } from '@/lib/validation-schemas';
 
 interface LockScreenProps {
   onUnlock: () => void;
@@ -87,19 +88,28 @@ export function LockScreen({ onUnlock, reason }: LockScreenProps) {
     e.preventDefault();
     setError('');
 
-    if (pin.length < 4) {
-      setError('PIN must be at least 4 digits');
+    // Validate PIN format with Zod
+    const validation = validateForm(pinSchema, { pin });
+    if (!validation.success) {
+      const errorMessage = Object.values(validation.errors)[0];
+      setError(errorMessage || 'Invalid PIN format');
       return;
     }
 
-    const isValid = biometricAuthManager.validatePin(pin);
+    // Validate PIN with rate limiting
+    const result = biometricAuthManager.validatePin(pin);
 
-    if (isValid) {
+    if (result.success) {
       toast.success('PIN correct');
       onUnlock();
     } else {
-      setError('Incorrect PIN. Please try again.');
+      setError(result.error || 'Incorrect PIN. Please try again.');
       setPin('');
+
+      // Show toast for lockout
+      if (result.lockoutSeconds) {
+        toast.error(result.error, { duration: 5000 });
+      }
     }
   };
 

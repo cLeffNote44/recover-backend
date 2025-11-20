@@ -1,4 +1,4 @@
-# Recovery Journey Roadmap
+# Recover Roadmap
 
 > Vision for the future: From personal tool to comprehensive recovery ecosystem
 
@@ -437,7 +437,7 @@ Building on our strong personal app foundation, we can become the **operating sy
 - Legal/court info
 
 **Patient Portal**
-- Patients use existing Recovery Journey app
+- Patients use existing Recover app
 - Facility-connected mode
 - Share data with treatment team
 - Secure messaging
@@ -1181,7 +1181,7 @@ Building on our strong personal app foundation, we can become the **operating sy
 ## Call to Action
 
 ### For Investors
-Recovery Journey represents a massive opportunity to improve outcomes for millions while building a sustainable, high-growth business. Our unique position as both a proven consumer app and enterprise platform gives us a competitive moat.
+Recover represents a massive opportunity to improve outcomes for millions while building a sustainable, high-growth business. Our unique position as both a proven consumer app and enterprise platform gives us a competitive moat.
 
 **Investment Opportunity:**
 - $2M seed round
@@ -1210,10 +1210,10 @@ Join our mission-driven team building technology that saves lives. We offer:
 
 **Interested in partnering, investing, or joining the team?**
 
-📧 Email: contact@recoveryjourney.app
-🌐 Website: https://recoveryjourney.app
-💼 LinkedIn: /company/recovery-journey
-🐦 Twitter: @RecoveryJourney
+📧 Email: contact@getrecover.app
+🌐 Website: https://getrecover.app
+💼 LinkedIn: /company/recover-app
+🐦 Twitter: @RecoverApp
 
 ---
 

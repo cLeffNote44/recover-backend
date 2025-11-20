@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppData } from '@/hooks/useAppData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,7 +8,7 @@ import { BREATHING_EXERCISES } from '@/lib/breathing-exercises';
 import { EmptyState } from '@/components/EmptyState';
 
 export function BreathingExercisesSection() {
-  const { skillBuilding } = useAppContext();
+  const { skillBuilding } = useAppData();
   const [selectedExercise, setSelectedExercise] = useState<typeof BREATHING_EXERCISES[0] | null>(null);
 
   const sessions = skillBuilding.breathingExercises;

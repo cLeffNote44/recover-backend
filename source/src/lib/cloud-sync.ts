@@ -2,10 +2,11 @@
  * Cloud Backup & Sync System
  *
  * Provides secure cloud backup and cross-device synchronization using
- * browser-based encryption and a simple cloud storage API.
+ * browser-based encryption and Supabase cloud storage.
  */
 
 import type { AppData } from '@/types/app';
+import { supabase, isSupabaseConfigured, BACKUP_BUCKET, getBackupPath, getMetadataPath } from './supabase';
 
 export interface CloudSyncConfig {
   apiEndpoint?: string;
@@ -122,7 +123,17 @@ export class SyncStateManager {
         autoSyncInterval: 30 // 30 minutes default
       };
     }
-    return JSON.parse(stored);
+    try {
+      return JSON.parse(stored);
+    } catch {
+      // If stored data is corrupted, return default config
+      return {
+        encryptionEnabled: true,
+        syncEnabled: false,
+        deviceId: this.generateDeviceId(),
+        autoSyncInterval: 30
+      };
+    }
   }
 
   static saveConfig(config: CloudSyncConfig): void {
@@ -206,7 +217,7 @@ export class CloudSyncService {
     password?: string
   ): Promise<CloudBackup> {
     const jsonData = JSON.stringify(appData);
-    const shouldEncrypt = this.config.encryptionEnabled && password;
+    const shouldEncrypt = Boolean(this.config.encryptionEnabled && password);
 
     let data: string;
     if (shouldEncrypt && password) {
@@ -257,80 +268,179 @@ export class CloudSyncService {
   }
 
   /**
-   * Upload backup to cloud (simulated - would use actual cloud API)
+   * Upload backup to cloud using Supabase Storage
    */
   async uploadBackup(
     backup: CloudBackup,
     userId: string
   ): Promise<{ success: boolean; backupId: string; url?: string }> {
-    // In a real implementation, this would:
-    // 1. Upload to cloud storage (S3, Firebase, etc.)
-    // 2. Store metadata in database
-    // 3. Return download URL
+    // Use Supabase if configured, otherwise fall back to localStorage
+    if (isSupabaseConfigured() && supabase) {
+      try {
+        const filePath = getBackupPath(userId, backup.metadata.id);
+        const backupData = JSON.stringify(backup);
 
-    // For now, simulate the upload with localStorage as "cloud"
-    const cloudKey = `cloud_backup_${userId}_${backup.metadata.id}`;
+        // Upload backup file to Supabase Storage
+        const { data, error } = await supabase.storage
+          .from(BACKUP_BUCKET)
+          .upload(filePath, backupData, {
+            contentType: 'application/json',
+            upsert: true, // Overwrite if exists
+          });
 
-    try {
-      // Simulate network delay
-      await this.delay(1000);
+        if (error) {
+          console.error('Supabase upload error:', error);
+          throw error;
+        }
 
-      // Store in localStorage (simulating cloud storage)
-      localStorage.setItem(cloudKey, JSON.stringify(backup));
+        // Update metadata file with list of all backups
+        const backupsList = await this.getBackupsList(userId);
+        const updatedList = [...backupsList.filter(b => b.id !== backup.metadata.id), backup.metadata];
+        const metadataPath = getMetadataPath(userId);
 
-      // Store in list of backups
-      const backupsList = this.getBackupsList(userId);
-      backupsList.push(backup.metadata);
-      localStorage.setItem(`cloud_backups_list_${userId}`, JSON.stringify(backupsList));
+        await supabase.storage
+          .from(BACKUP_BUCKET)
+          .upload(metadataPath, JSON.stringify(updatedList), {
+            contentType: 'application/json',
+            upsert: true,
+          });
 
-      return {
-        success: true,
-        backupId: backup.metadata.id,
-        url: `cloud://${userId}/${backup.metadata.id}`
-      };
-    } catch (error) {
-      console.error('Upload failed:', error);
-      return {
-        success: false,
-        backupId: backup.metadata.id
-      };
+        // Get public URL
+        const { data: urlData } = supabase.storage
+          .from(BACKUP_BUCKET)
+          .getPublicUrl(filePath);
+
+        return {
+          success: true,
+          backupId: backup.metadata.id,
+          url: urlData.publicUrl
+        };
+      } catch (error) {
+        console.error('Upload failed:', error);
+        return {
+          success: false,
+          backupId: backup.metadata.id
+        };
+      }
+    } else {
+      // Fallback to localStorage if Supabase not configured
+      const cloudKey = `cloud_backup_${userId}_${backup.metadata.id}`;
+
+      try {
+        // Simulate network delay
+        await this.delay(1000);
+
+        // Store in localStorage (simulating cloud storage)
+        localStorage.setItem(cloudKey, JSON.stringify(backup));
+
+        // Store in list of backups
+        const backupsList = await this.getBackupsList(userId);
+        backupsList.push(backup.metadata);
+        localStorage.setItem(`cloud_backups_list_${userId}`, JSON.stringify(backupsList));
+
+        return {
+          success: true,
+          backupId: backup.metadata.id,
+          url: `cloud://${userId}/${backup.metadata.id}`
+        };
+      } catch (error) {
+        console.error('Upload failed:', error);
+        return {
+          success: false,
+          backupId: backup.metadata.id
+        };
+      }
     }
   }
 
   /**
-   * Download backup from cloud (simulated)
+   * Download backup from cloud using Supabase Storage
    */
   async downloadBackup(
     userId: string,
     backupId: string
   ): Promise<CloudBackup | null> {
-    const cloudKey = `cloud_backup_${userId}_${backupId}`;
+    // Use Supabase if configured, otherwise fall back to localStorage
+    if (isSupabaseConfigured() && supabase) {
+      try {
+        const filePath = getBackupPath(userId, backupId);
 
-    try {
-      // Simulate network delay
-      await this.delay(800);
+        // Download backup file from Supabase Storage
+        const { data, error } = await supabase.storage
+          .from(BACKUP_BUCKET)
+          .download(filePath);
 
-      const stored = localStorage.getItem(cloudKey);
-      if (!stored) return null;
+        if (error) {
+          console.error('Supabase download error:', error);
+          return null;
+        }
 
-      return JSON.parse(stored);
-    } catch (error) {
-      console.error('Download failed:', error);
-      return null;
+        // Read the blob as text
+        const text = await data.text();
+        return JSON.parse(text);
+      } catch (error) {
+        console.error('Download failed:', error);
+        return null;
+      }
+    } else {
+      // Fallback to localStorage if Supabase not configured
+      const cloudKey = `cloud_backup_${userId}_${backupId}`;
+
+      try {
+        // Simulate network delay
+        await this.delay(800);
+
+        const stored = localStorage.getItem(cloudKey);
+        if (!stored) return null;
+
+        return JSON.parse(stored);
+      } catch (error) {
+        console.error('Download failed:', error);
+        return null;
+      }
     }
   }
 
   /**
    * List all backups for a user
    */
-  getBackupsList(userId: string): BackupMetadata[] {
-    const stored = localStorage.getItem(`cloud_backups_list_${userId}`);
-    if (!stored) return [];
+  async getBackupsList(userId: string): Promise<BackupMetadata[]> {
+    // Use Supabase if configured, otherwise fall back to localStorage
+    if (isSupabaseConfigured() && supabase) {
+      try {
+        const metadataPath = getMetadataPath(userId);
 
-    try {
-      return JSON.parse(stored);
-    } catch {
-      return [];
+        // Download metadata file from Supabase Storage
+        const { data, error } = await supabase.storage
+          .from(BACKUP_BUCKET)
+          .download(metadataPath);
+
+        if (error) {
+          // If metadata file doesn't exist yet, return empty array
+          if (error.message.includes('not found')) {
+            return [];
+          }
+          console.error('Supabase metadata download error:', error);
+          return [];
+        }
+
+        // Read the blob as text
+        const text = await data.text();
+        return JSON.parse(text);
+      } catch (error) {
+        console.error('Failed to get backups list:', error);
+        return [];
+      }
+    } else {
+      // Fallback to localStorage if Supabase not configured
+      const stored = localStorage.getItem(`cloud_backups_list_${userId}`);
+      if (!stored) return [];
+
+      try {
+        return JSON.parse(stored);
+      } catch {
+        return [];
+      }
     }
   }
 
@@ -338,21 +448,56 @@ export class CloudSyncService {
    * Delete a backup
    */
   async deleteBackup(userId: string, backupId: string): Promise<boolean> {
-    const cloudKey = `cloud_backup_${userId}_${backupId}`;
+    // Use Supabase if configured, otherwise fall back to localStorage
+    if (isSupabaseConfigured() && supabase) {
+      try {
+        const filePath = getBackupPath(userId, backupId);
 
-    try {
-      // Remove backup data
-      localStorage.removeItem(cloudKey);
+        // Delete backup file from Supabase Storage
+        const { error } = await supabase.storage
+          .from(BACKUP_BUCKET)
+          .remove([filePath]);
 
-      // Update backups list
-      const backupsList = this.getBackupsList(userId);
-      const filtered = backupsList.filter(b => b.id !== backupId);
-      localStorage.setItem(`cloud_backups_list_${userId}`, JSON.stringify(filtered));
+        if (error) {
+          console.error('Supabase delete error:', error);
+          return false;
+        }
 
-      return true;
-    } catch (error) {
-      console.error('Delete failed:', error);
-      return false;
+        // Update metadata file
+        const backupsList = await this.getBackupsList(userId);
+        const filtered = backupsList.filter(b => b.id !== backupId);
+        const metadataPath = getMetadataPath(userId);
+
+        await supabase.storage
+          .from(BACKUP_BUCKET)
+          .upload(metadataPath, JSON.stringify(filtered), {
+            contentType: 'application/json',
+            upsert: true,
+          });
+
+        return true;
+      } catch (error) {
+        console.error('Delete failed:', error);
+        return false;
+      }
+    } else {
+      // Fallback to localStorage if Supabase not configured
+      const cloudKey = `cloud_backup_${userId}_${backupId}`;
+
+      try {
+        // Remove backup data
+        localStorage.removeItem(cloudKey);
+
+        // Update backups list
+        const backupsList = await this.getBackupsList(userId);
+        const filtered = backupsList.filter(b => b.id !== backupId);
+        localStorage.setItem(`cloud_backups_list_${userId}`, JSON.stringify(filtered));
+
+        return true;
+      } catch (error) {
+        console.error('Delete failed:', error);
+        return false;
+      }
     }
   }
 
@@ -376,7 +521,7 @@ export class CloudSyncService {
       SyncStateManager.saveStatus({ ...status, status: 'syncing' });
 
       // Get latest cloud backup
-      const backupsList = this.getBackupsList(userId);
+      const backupsList = await this.getBackupsList(userId);
       const latestBackup = backupsList.sort((a, b) =>
         new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
       )[0];

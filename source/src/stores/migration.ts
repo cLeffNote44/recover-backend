@@ -38,22 +38,17 @@ export async function migrateToZustand(): Promise<{
   try {
     // Check if migration already completed
     if (isMigrationCompleted()) {
-      console.log('[Store Migration] Migration already completed, skipping');
       return { success: true };
     }
-
-    console.log('[Store Migration] Starting migration from AppContext to Zustand stores...');
 
     // Load old data
     const stored = await storage.getItem(OLD_STORAGE_KEY);
     if (!stored) {
-      console.log('[Store Migration] No old data found, marking migration complete');
       markMigrationCompleted();
       return { success: true };
     }
 
     const oldData = JSON.parse(stored);
-    console.log('[Store Migration] Found old data, migrating...');
 
     // Migrate to Recovery Store
     const recoveryStore = useRecoveryStore.getState();
@@ -126,7 +121,6 @@ export async function migrateToZustand(): Promise<{
     // Mark migration as completed
     markMigrationCompleted();
 
-    console.log('[Store Migration] Migration completed successfully');
     return { success: true };
   } catch (error) {
     console.error('[Store Migration] Migration failed:', error);
@@ -142,5 +136,4 @@ export async function migrateToZustand(): Promise<{
  */
 export function resetMigration(): void {
   localStorage.removeItem(MIGRATION_FLAG);
-  console.log('[Store Migration] Migration flag reset');
 }

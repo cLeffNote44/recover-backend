@@ -14,18 +14,23 @@ export interface MigrationResult {
   warnings?: string[];
 }
 
-export type Migration = (data: any) => any;
+/**
+ * Migration function type
+ * Uses Partial<AppData> to allow flexible data transformations
+ * while maintaining some type safety
+ */
+export type Migration = (data: Partial<AppData> & Record<string, unknown>) => Partial<AppData> & Record<string, unknown>;
 
 /**
  * Migration registry - add new migrations here
  */
 const migrations: Record<string, Migration> = {
-  '1.0': (data: any) => {
+  '1.0': (data) => {
     // Base version - no migration needed
     return data;
   },
 
-  '1.1': (data: any) => {
+  '1.1': (data) => {
     // Example: Add new field with default
     return {
       ...data,
@@ -47,7 +52,7 @@ const migrations: Record<string, Migration> = {
     };
   },
 
-  '1.2': (data: any) => {
+  '1.2': (data) => {
     // Example: Add setbacks field if missing
     return {
       ...data,
@@ -56,11 +61,12 @@ const migrations: Record<string, Migration> = {
     };
   },
 
-  '2.0': (data: any) => {
+  '2.0': (data) => {
     // Example: Breaking change - restructure check-ins
+    const checkIns = Array.isArray(data.checkIns) ? data.checkIns : [];
     return {
       ...data,
-      checkIns: (data.checkIns || []).map((checkIn: any) => ({
+      checkIns: checkIns.map((checkIn: Record<string, unknown>) => ({
         ...checkIn,
         // Ensure all check-ins have required fields
         id: checkIn.id || Date.now() + Math.random(),
@@ -115,7 +121,7 @@ export function getRequiredMigrations(fromVersion: string, toVersion: string): s
 /**
  * Run a single migration
  */
-function runMigration(data: any, version: string): any {
+function runMigration(data: Partial<AppData> & Record<string, unknown>, version: string): Partial<AppData> & Record<string, unknown> {
   const migration = migrations[version];
   if (!migration) {
     throw new Error(`Migration ${version} not found`);
@@ -129,7 +135,7 @@ function runMigration(data: any, version: string): any {
  * Migrate data from one version to another
  */
 export function migrateData(
-  data: any,
+  data: Partial<AppData> & Record<string, unknown>,
   fromVersion: string,
   toVersion: string
 ): MigrationResult {
@@ -215,7 +221,7 @@ export function migrateData(
 /**
  * Validate migrated data structure
  */
-function validateMigratedData(data: any): { valid: boolean; errors: string[] } {
+function validateMigratedData(data: Record<string, unknown>): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
 
   // Check required fields
@@ -268,7 +274,7 @@ function validateMigratedData(data: any): { valid: boolean; errors: string[] } {
 /**
  * Create a backup before migration
  */
-export function createMigrationBackup(data: any, fromVersion: string): void {
+export function createMigrationBackup(data: unknown, fromVersion: string): void {
   const backup = {
     data,
     version: fromVersion,
@@ -289,7 +295,7 @@ export function createMigrationBackup(data: any, fromVersion: string): void {
 /**
  * Restore from migration backup
  */
-export function restoreFromBackup(backupKey: string): any | null {
+export function restoreFromBackup(backupKey: string): (Partial<AppData> & Record<string, unknown>) | null {
   try {
     const backup = localStorage.getItem(backupKey);
     if (backup) {
@@ -335,10 +341,10 @@ export function cleanupOldBackups(keepLast: number = 3): void {
  * Automatic migration on app load
  */
 export function autoMigrate(
-  data: any,
+  data: Partial<AppData> & Record<string, unknown>,
   dataVersion: string | undefined,
   targetVersion: string
-): { data: any; result: MigrationResult } {
+): { data: Partial<AppData> & Record<string, unknown>; result: MigrationResult } {
   const fromVersion = dataVersion || '1.0';
 
   // Create backup before migration

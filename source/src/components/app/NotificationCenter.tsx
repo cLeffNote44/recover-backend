@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppData } from '@/hooks/useAppData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -14,7 +14,7 @@ import {
   Flame,
   CheckCircle
 } from 'lucide-react';
-import { calculateDaysSober } from '@/lib/utils-app';
+import { calculateDaysSober } from '@/lib/utils';
 
 interface Notification {
   id: string;
@@ -43,7 +43,7 @@ export function NotificationCenter({ onNavigate }: NotificationCenterProps) {
     meetings,
     sleepEntries,
     relapses
-  } = useAppContext();
+  } = useAppData();
 
   const notifications = useMemo(() => {
     const alerts: Notification[] = [];

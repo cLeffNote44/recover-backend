@@ -1,6 +1,6 @@
 # Deployment Guide
 
-> Instructions for deploying Recovery Journey to various platforms
+> Instructions for deploying Recover to various platforms
 
 ## Table of Contents
 
@@ -639,7 +639,7 @@ Sentry.init({
 
 ```html
 <!-- public/index.html -->
-<script defer data-domain="recoveryjourney.app"
+<script defer data-domain="getrecover.app"
   src="https://plausible.io/js/script.js"></script>
 ```
 
@@ -757,7 +757,7 @@ git checkout -b hotfix/critical-fix
 ## Support
 
 **Deployment Issues:**
-- 📧 Email: support@recoveryjourney.app
+- 📧 Email: support@getrecover.app
 - 💬 GitHub Discussions
 - 📖 Platform-specific docs:
   - [Vercel Docs](https://vercel.com/docs)

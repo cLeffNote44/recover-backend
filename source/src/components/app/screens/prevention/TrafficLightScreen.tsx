@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppData } from '@/hooks/useAppData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -51,7 +51,7 @@ const TRAFFIC_LIGHT_INFO = {
 };
 
 export function TrafficLightScreen() {
-  const { relapsePlan, setRelapsePlan, contacts } = useAppContext();
+  const { relapsePlan, setRelapsePlan, contacts } = useAppData();
   const [activeSection, setActiveSection] = useState<'overview' | 'warning' | 'situations' | 'actions'>('overview');
   const [showAddModal, setShowAddModal] = useState<{
     type: 'warningSigns' | 'highRiskSituations' | 'greenActions' | 'yellowActions' | 'redActions' | null;

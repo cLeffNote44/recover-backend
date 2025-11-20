@@ -1,6 +1,6 @@
 # Features Documentation
 
-> Comprehensive guide to all Recovery Journey features
+> Comprehensive guide to all Recover features
 
 ## Table of Contents
 
@@ -897,7 +897,7 @@ Protect your recovery data with device biometrics.
 
 ### 20. Progressive Web App
 
-Install Recovery Journey as a native-feeling app on any device.
+Install Recover as a native-feeling app on any device.
 
 #### PWA Features
 
@@ -993,7 +993,7 @@ iOS and Android widgets showing your progress at a glance.
 #### Setup
 1. Long-press home screen
 2. Tap widget button (+)
-3. Find "Recovery Journey"
+3. Find "Recover"
 4. Choose size
 5. Drag to home screen
 6. Customize in app (Settings > Widgets)

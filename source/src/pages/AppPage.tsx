@@ -1,5 +1,5 @@
 import { useState, lazy, Suspense } from 'react';
-import { AppProvider, useAppContext } from '@/contexts/AppContext';
+import { useAppData } from '@/hooks/useAppData';
 import { BottomNav } from '@/components/app/BottomNav';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, Search } from 'lucide-react';
@@ -22,7 +22,7 @@ function AppContent() {
   const [activeTab, setActiveTab] = useState('home');
   const [showEmergency, setShowEmergency] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
-  const { loading, contacts } = useAppContext();
+  const { loading, contacts } = useAppData();
 
   if (loading) {
     return (

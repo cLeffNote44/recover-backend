@@ -30,7 +30,6 @@ export function isNative(): boolean {
  */
 export async function requestNotificationPermission(): Promise<boolean> {
   if (!isNative()) {
-    console.log('Not on native platform, skipping notification permission');
     return false;
   }
 
@@ -65,14 +64,12 @@ export async function checkNotificationPermission(): Promise<boolean> {
  */
 export async function scheduleDailyCheckInReminder(time: string): Promise<void> {
   if (!isNative()) {
-    console.log('Not on native platform, skipping notification scheduling');
     return;
   }
 
   try {
     const hasPermission = await checkNotificationPermission();
     if (!hasPermission) {
-      console.log('No notification permission');
       return;
     }
 
@@ -113,7 +110,6 @@ export async function scheduleDailyCheckInReminder(time: string): Promise<void> 
     };
 
     await LocalNotifications.schedule(notification);
-    console.log('Daily check-in reminder scheduled for', time);
   } catch (error) {
     console.error('Error scheduling daily check-in reminder:', error);
   }

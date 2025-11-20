@@ -6,6 +6,7 @@ import {
   calculateTotalSavings,
   getMoodTrend
 } from './utils-app';
+import { getUnlockedBadges } from './badges';
 import type { CheckIn, Badge } from '@/types/app';
 
 describe('utils-app', () => {
@@ -173,9 +174,6 @@ describe('utils-app', () => {
     });
   });
 
-  // Commented out - getUnlockedBadges function is not exported from utils-app
-  // TODO: Re-implement badge checking tests when function is available
-  /*
   describe('getUnlockedBadges', () => {
     it('should unlock 24h badge after 1 day', () => {
       const badges = getUnlockedBadges({
@@ -207,7 +205,7 @@ describe('utils-app', () => {
       expect(badges.some(b => b.id === '1week')).toBe(true);
     });
 
-    it('should unlock month badge after 30 days', () => {
+    it('should unlock 30 day badge after 30 days', () => {
       const badges = getUnlockedBadges({
         daysSober: 30,
         checkInsCount: 30,
@@ -219,25 +217,25 @@ describe('utils-app', () => {
         challengesCompleted: 0,
         streak: 30
       });
-      expect(badges.some(b => b.id === '1month')).toBe(true);
+      expect(badges.some(b => b.id === '30days')).toBe(true);
     });
 
-    it('should unlock dedicated badge after 10 check-ins', () => {
+    it('should unlock check-in badge after 50 check-ins', () => {
       const badges = getUnlockedBadges({
-        daysSober: 10,
-        checkInsCount: 10,
+        daysSober: 50,
+        checkInsCount: 50,
         cravingsOvercome: 0,
         meetingsAttended: 0,
         meditationMinutes: 0,
         gratitudeCount: 0,
         growthLogsCount: 0,
         challengesCompleted: 0,
-        streak: 10
+        streak: 50
       });
-      expect(badges.some(b => b.id === 'dedicated')).toBe(true);
+      expect(badges.some(b => b.id === 'checkin50')).toBe(true);
     });
 
-    it('should unlock warrior badge after overcoming cravings', () => {
+    it('should unlock urge defender badge after overcoming 10 cravings', () => {
       const badges = getUnlockedBadges({
         daysSober: 10,
         checkInsCount: 10,
@@ -249,8 +247,7 @@ describe('utils-app', () => {
         challengesCompleted: 0,
         streak: 10
       });
-      expect(badges.some(b => b.id === 'warrior')).toBe(true);
+      expect(badges.some(b => b.id === 'craving10')).toBe(true);
     });
   });
-  */
 });

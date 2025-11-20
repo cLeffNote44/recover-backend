@@ -1,4 +1,4 @@
-# Recovery Journey - Complete Feature List
+# Recover - Complete Feature List
 
 **Last Updated:** October 27, 2025
 **Version:** 5.1 - Enhanced with AI Analytics & Advanced Features

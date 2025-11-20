@@ -4,7 +4,7 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch, Redirect } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { useAppContext, AppProvider } from "./contexts/AppContext";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import Home from "./pages/Home";
 import AppPage from "./pages/AppPage";
 import Onboarding from "./pages/Onboarding";
@@ -15,15 +15,7 @@ import { App as CapacitorApp } from '@capacitor/app';
 import { useState, useEffect } from "react";
 
 function ProtectedRoute({ component: Component }: { component: () => JSX.Element }) {
-  const { userProfile, loading } = useAppContext();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-gray-900 to-gray-900">
-        <div className="text-white text-xl">Loading...</div>
-      </div>
-    );
-  }
+  const userProfile = useSettingsStore((state) => state.userProfile);
 
   // Check if user profile exists - if not, redirect to onboarding
   if (!userProfile) {
@@ -112,25 +104,23 @@ function App() {
         defaultTheme="dark"
         switchable
       >
-        <AppProvider>
-          <TooltipProvider>
-            {/* Screen reader announcements */}
-            <div
-              role="status"
-              aria-live="polite"
-              aria-atomic="true"
-              className="sr-only"
-              id="accessibility-announcements"
-            />
-            <Toaster />
+        <TooltipProvider>
+          {/* Screen reader announcements */}
+          <div
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+            className="sr-only"
+            id="accessibility-announcements"
+          />
+          <Toaster />
 
-            {/* Lock Screen Overlay */}
-            {isLocked && <LockScreen onUnlock={handleUnlock} />}
+          {/* Lock Screen Overlay */}
+          {isLocked && <LockScreen onUnlock={handleUnlock} />}
 
-            {/* Main App Router */}
-            <Router />
-          </TooltipProvider>
-        </AppProvider>
+          {/* Main App Router */}
+          <Router />
+        </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

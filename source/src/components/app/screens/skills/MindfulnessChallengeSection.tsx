@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppData } from '@/hooks/useAppData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,7 +9,7 @@ import { MINDFULNESS_CHALLENGE, getMindfulnessDay } from '@/lib/mindfulness-chal
 import { toast } from 'sonner';
 
 export function MindfulnessChallengeSection() {
-  const { skillBuilding, setSkillBuilding } = useAppContext();
+  const { skillBuilding, setSkillBuilding } = useAppData();
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [dayNote, setDayNote] = useState('');
 

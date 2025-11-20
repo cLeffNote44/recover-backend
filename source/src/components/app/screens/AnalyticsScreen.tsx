@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useMemo } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppData } from '@/hooks/useAppData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AnalyticsScreenSkeleton } from '@/components/LoadingSkeletons';
 import { Spinner } from '@/components/LoadingSkeletons';
 import { TrendingUp, Calendar, Heart, Brain, Target, Award, AlertCircle, Apple, Flame, Users, Moon, FileText, X, Sparkles, BarChart3 } from 'lucide-react';
-import { calculateDaysSober, calculateStreak, getMoodTrend, getTotalMeditationMinutes } from '@/lib/utils-app';
+import { calculateDaysSober, calculateStreak, getMoodTrend, getTotalMeditationMinutes } from '@/lib/utils';
 import { BADGES } from '@/lib/constants';
 import { celebrate } from '@/lib/celebrations';
 import { PDFReport } from '@/components/PDFReport';
@@ -23,7 +23,7 @@ import type { HALTCheck } from '@/types/app';
 import { toast } from 'sonner';
 
 export function AnalyticsScreen() {
-  const context = useAppContext();
+  const context = useAppData();
   const {
     sobrietyDate,
     checkIns,

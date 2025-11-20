@@ -175,3 +175,97 @@ export function getBadgeCategoryColor(category?: string): string {
       return 'bg-muted text-muted-foreground';
   }
 }
+
+/**
+ * Helper function for testing badge unlocking
+ * Takes simplified statistics and returns unlocked badges
+ *
+ * @example
+ * ```typescript
+ * const badges = getUnlockedBadges({
+ *   daysSober: 7,
+ *   checkInsCount: 7,
+ *   streak: 7
+ * });
+ * ```
+ */
+export function getUnlockedBadges(stats: {
+  daysSober: number;
+  checkInsCount?: number;
+  cravingsOvercome?: number;
+  meetingsAttended?: number;
+  meditationMinutes?: number;
+  gratitudeCount?: number;
+  growthLogsCount?: number;
+  challengesCompleted?: number;
+  streak?: number;
+}): Badge[] {
+  // Create mock data objects from statistics
+  const mockDate = new Date();
+  mockDate.setDate(mockDate.getDate() - stats.daysSober);
+  const sobrietyDate = mockDate.toISOString().split('T')[0];
+
+  // Create minimal data arrays for badge calculation
+  const checkIns: CheckIn[] = Array.from({ length: stats.checkInsCount || 0 }, (_, i) => ({
+    id: i + 1,
+    date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    mood: 5,
+  }));
+
+  const cravings: Craving[] = Array.from({ length: stats.cravingsOvercome || 0 }, (_, i) => ({
+    id: i + 1,
+    date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    intensity: 5,
+    trigger: 'test',
+    overcame: true,
+  }));
+
+  const meetings: Meeting[] = Array.from({ length: stats.meetingsAttended || 0 }, (_, i) => ({
+    id: i + 1,
+    date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    type: 'AA',
+    notes: '',
+  }));
+
+  const meditations: Meditation[] = Array.from({ length: stats.meditationMinutes || 0 }, (_, i) => ({
+    id: i + 1,
+    date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    duration: 1, // 1 meditation = 1 minute for simplicity
+    type: 'breathing',
+  }));
+
+  const gratitude: Gratitude[] = Array.from({ length: stats.gratitudeCount || 0 }, (_, i) => ({
+    id: i + 1,
+    date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    content: 'test gratitude',
+  }));
+
+  const growthLogs: GrowthLog[] = Array.from({ length: stats.growthLogsCount || 0 }, (_, i) => ({
+    id: i + 1,
+    date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    milestone: 'test milestone',
+  }));
+
+  const challenges: Challenge[] = Array.from({ length: stats.challengesCompleted || 0 }, (_, i) => ({
+    id: i + 1,
+    date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    challenge: 'test challenge',
+    completed: true,
+  }));
+
+  // Calculate badge progress
+  const badgeProgress = calculateBadgeProgress({
+    sobrietyDate,
+    checkIns,
+    meditations,
+    meetings,
+    cravings,
+    gratitude,
+    growthLogs,
+    challenges,
+    unlockedBadges: [],
+  });
+
+  // Return only the unlocked badges (just the Badge objects)
+  return getEarnedBadges(badgeProgress).map(bp => bp.badge);
+}

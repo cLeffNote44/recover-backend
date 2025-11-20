@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppData } from '@/hooks/useAppData';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -25,7 +25,7 @@ import {
 import { toast } from 'sonner';
 
 export function WidgetConfigPanel() {
-  const context = useAppContext();
+  const context = useAppData();
   const [config, setConfig] = useState<WidgetConfig>(getWidgetConfig());
   const [isUpdating, setIsUpdating] = useState(false);
   const [previewTheme, setPreviewTheme] = useState<'light' | 'dark'>('light');

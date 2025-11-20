@@ -8,9 +8,30 @@ import {
   Apple, Flame, Users, Moon, AlertCircle, CheckCircle, Info
 } from 'lucide-react';
 
+/**
+ * HALTCheck Component
+ *
+ * Interactive assessment tool for HALT (Hungry, Angry, Lonely, Tired) - four common
+ * states that increase relapse risk in recovery. Users rate each factor on a scale
+ * of 1-10, and receive personalized suggestions based on their responses.
+ *
+ * HALT is a widely-used recovery acronym that helps identify vulnerability states
+ * before they become cravings or lead to relapse.
+ *
+ * @example
+ * ```tsx
+ * <HALTCheck
+ *   onComplete={(haltData) => saveCheckIn({ halt: haltData })}
+ *   showSuggestions={true}
+ * />
+ * ```
+ */
 interface HALTCheckProps {
+  /** Callback fired when user completes the HALT check */
   onComplete?: (halt: HALTCheckType) => void;
+  /** Pre-fill the form with existing HALT values (for editing) */
   initialValues?: HALTCheckType;
+  /** Show personalized coping suggestions based on responses (default: true) */
   showSuggestions?: boolean;
 }
 

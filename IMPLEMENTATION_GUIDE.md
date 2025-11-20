@@ -1,4 +1,4 @@
-# Recovery Journey - Implementation Guide
+# Recover - Implementation Guide
 
 ## ✅ **COMPLETED: Critical Features for App Store Deployment**
 
@@ -162,7 +162,7 @@ interface AppData {
 
 4. **Configure in Xcode**:
    - Set bundle identifier: `com.recovery.journey`
-   - Set app name: "Recovery Journey"
+   - Set app name: "Recover"
    - Add app icons (already configured in `public/icons/`)
    - Configure signing & capabilities
    - Enable Push Notifications capability
@@ -198,7 +198,7 @@ interface AppData {
 
 4. **Configure in Android Studio**:
    - Set package name: `com.recovery.journey`
-   - Set app name: "Recovery Journey"
+   - Set app name: "Recover"
    - Update `AndroidManifest.xml` permissions (already configured)
    - Add app icons (already configured)
    - Generate signing key:

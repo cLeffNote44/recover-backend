@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppData } from '@/hooks/useAppData';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -14,7 +14,7 @@ import { SelfCompassionSection } from './skills/SelfCompassionSection';
 
 export function SkillsScreen() {
   const [activeSection, setActiveSection] = useState('overview');
-  const { meditations, cravings, gratitude } = useAppContext();
+  const { meditations, cravings, gratitude } = useAppData();
 
   // Overview stats - using existing data from context
   const mindfulnessDaysCompleted = meditations.length;

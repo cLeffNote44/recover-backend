@@ -1,5 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useRecoveryStore } from '@/stores/useRecoveryStore';
+import { useJournalStore } from '@/stores/useJournalStore';
+import { useActivitiesStore } from '@/stores/useActivitiesStore';
+import { useSettingsStore } from '@/stores/useSettingsStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +14,7 @@ import {
   Calendar, CheckCircle, Heart, Flame,
   Shield, DollarSign, Trophy, Moon, Sun, RefreshCw, X
 } from 'lucide-react';
-import { calculateDaysSober, calculateStreak, getMilestone, getMoodTrend, calculateTotalSavings, calculateTotalSoberDaysThisYear, calculateTotalRecoveryDays } from '@/lib/utils-app';
+import { calculateDaysSober, calculateStreak, getMilestone, getMoodTrend, calculateTotalSavings, calculateTotalSoberDaysThisYear, calculateTotalRecoveryDays } from '@/lib/utils';
 import { MOOD_EMOJIS } from '@/lib/constants';
 import { celebrate } from '@/lib/celebrations';
 import { calculateBadgeProgress, getRecentlyEarnedBadges, getBadgeTierColor } from '@/lib/badges';
@@ -20,33 +23,42 @@ import { RiskPredictionCard } from '../RiskPredictionCard';
 import { InsightCards } from '../InsightCards';
 import type { HALTCheck as HALTCheckType } from '@/types/app';
 import { toast } from 'sonner';
+import { getQuoteOfTheDay } from '@/lib/quotes';
 
 export function HomeScreen() {
-  const {
-    sobrietyDate,
-    setSobrietyDate,
-    checkIns,
-    setCheckIns,
-    meditations,
-    cravings,
-    meetings,
-    gratitude,
-    growthLogs,
-    challenges,
-    unlockedBadges,
-    currentQuote,
-    refreshQuote,
-    darkMode,
-    setDarkMode,
-    costPerDay,
-    reasonsForSobriety,
-    celebrationsEnabled,
-    cleanPeriods,
-    sleepEntries,
-    exerciseEntries,
-    relapses,
-    loading
-  } = useAppContext();
+  // Zustand stores
+  const sobrietyDate = useRecoveryStore((state) => state.sobrietyDate);
+  const setSobrietyDate = useRecoveryStore((state) => state.setSobrietyDate);
+  const unlockedBadges = useRecoveryStore((state) => state.unlockedBadges);
+  const costPerDay = useRecoveryStore((state) => state.costPerDay);
+  const reasonsForSobriety = useRecoveryStore((state) => state.reasonsForSobriety);
+  const cleanPeriods = useRecoveryStore((state) => state.cleanPeriods);
+  const relapses = useRecoveryStore((state) => state.relapses);
+
+  const checkIns = useJournalStore((state) => state.checkIns);
+  const setCheckIns = useJournalStore((state) => state.setCheckIns);
+  const meditations = useJournalStore((state) => state.meditations);
+  const meetings = useJournalStore((state) => state.meetings);
+  const gratitude = useJournalStore((state) => state.gratitude);
+  const growthLogs = useJournalStore((state) => state.growthLogs);
+  const challenges = useJournalStore((state) => state.challenges);
+
+  const cravings = useActivitiesStore((state) => state.cravings);
+
+  const darkMode = useSettingsStore((state) => state.darkMode);
+  const setDarkMode = useSettingsStore((state) => state.setDarkMode);
+  const celebrationsEnabled = useSettingsStore((state) => state.celebrationsEnabled);
+  const sleepEntries = useSettingsStore((state) => state.sleepEntries);
+  const exerciseEntries = useSettingsStore((state) => state.exerciseEntries);
+
+  // Get current quote (temporary - will be refactored)
+  const currentQuote = useMemo(() => getQuoteOfTheDay(), []);
+  const refreshQuote = () => {
+    // Quote refresh logic will be added later
+  };
+
+  // No loading state needed with Zustand (instant)
+  const loading = false;
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showCheckInModal, setShowCheckInModal] = useState(false);
@@ -58,7 +70,7 @@ export function HomeScreen() {
 
   // Memoize expensive calculations to prevent unnecessary recalculations
   const daysSober = useMemo(() => calculateDaysSober(sobrietyDate), [sobrietyDate]);
-  const totalRecoveryDays = useMemo(() => calculateTotalRecoveryDays(cleanPeriods || [], sobrietyDate), [cleanPeriods, sobrietyDate]);
+  const totalRecoveryDays = useMemo(() => calculateTotalRecoveryDays(sobrietyDate, cleanPeriods || []), [sobrietyDate, cleanPeriods]);
   const streak = useMemo(() => calculateStreak(checkIns), [checkIns]);
   const totalSoberDaysThisYear = useMemo(() => calculateTotalSoberDaysThisYear(checkIns), [checkIns]);
   const milestone = useMemo(() => getMilestone(daysSober), [daysSober]);

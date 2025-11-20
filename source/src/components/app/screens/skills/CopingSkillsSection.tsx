@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppData } from '@/hooks/useAppData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +13,7 @@ import type { CopingSkill } from '@/types/app';
 import { toast } from 'sonner';
 
 export function CopingSkillsSection() {
-  const { skillBuilding, setSkillBuilding } = useAppContext();
+  const { skillBuilding, setSkillBuilding } = useAppData();
   const [selectedCategory, setSelectedCategory] = useState<CopingSkill['category'] | 'all'>('all');
   const [selectedSkill, setSelectedSkill] = useState<CopingSkill | null>(null);
   const [searchQuery, setSearchQuery] = useState('');

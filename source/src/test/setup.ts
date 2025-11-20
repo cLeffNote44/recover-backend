@@ -9,12 +9,21 @@ afterEach(() => {
 
 // Mock localStorage
 const localStorageMock = {
-  getItem: vi.fn(),
+  getItem: vi.fn(() => null),
   setItem: vi.fn(),
   removeItem: vi.fn(),
   clear: vi.fn(),
 };
 global.localStorage = localStorageMock as any;
+
+// Reset localStorage mock before each test
+beforeEach(() => {
+  localStorageMock.getItem.mockReturnValue(null);
+  localStorageMock.setItem.mockClear();
+  localStorageMock.getItem.mockClear();
+  localStorageMock.removeItem.mockClear();
+  localStorageMock.clear.mockClear();
+});
 
 // Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {
@@ -56,7 +65,9 @@ beforeEach(() => {
   console.error = (...args: any[]) => {
     if (
       typeof args[0] === 'string' &&
-      args[0].includes('Warning: ReactDOM.render')
+      (args[0].includes('Warning: ReactDOM.render') ||
+       args[0].includes('Function components cannot be given refs') ||
+       args[0].includes('Primitive.div.SlotClone'))
     ) {
       return;
     }

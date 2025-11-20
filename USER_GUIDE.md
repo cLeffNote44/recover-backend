@@ -1,6 +1,6 @@
-# Recovery Journey v5.1 - User Guide
+# Recover v5.1 - User Guide
 
-Your complete guide to using the Recovery Journey app effectively.
+Your complete guide to using the Recover app effectively.
 
 **What's New in v5.1:**
 - 🤖 **AI-Powered Insights** - Get personalized recommendations and pattern detection

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppData } from '@/hooks/useAppData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 import type { ValueEntry } from '@/types/app';
 
 export function ValuesSection() {
-  const { skillBuilding, setSkillBuilding } = useAppContext();
+  const { skillBuilding, setSkillBuilding } = useAppData();
   const [showAdd, setShowAdd] = useState(false);
   const [customValue, setCustomValue] = useState({ value: '', description: '' });
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'relationships' | 'personal-growth' | 'contribution' | 'health' | 'integrity'>('all');

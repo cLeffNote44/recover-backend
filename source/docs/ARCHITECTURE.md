@@ -1,6 +1,6 @@
 # Architecture Documentation
 
-> Technical architecture and design decisions for Recovery Journey
+> Technical architecture and design decisions for Recover
 
 ## Table of Contents
 
@@ -19,7 +19,7 @@
 
 ## System Overview
 
-Recovery Journey is built as a **privacy-first, offline-first Progressive Web App** with native mobile capabilities through Capacitor.
+Recover is built as a **privacy-first, offline-first Progressive Web App** with native mobile capabilities through Capacitor.
 
 ### Core Principles
 
@@ -345,7 +345,7 @@ const handleCheckIn = () => {
 // Future implementation
 import Dexie from 'dexie';
 
-const db = new Dexie('RecoveryJourney');
+const db = new Dexie('Recover');
 db.version(1).stores({
   checkIns: '++id, date, mood',
   meditations: '++id, date, duration',
@@ -400,7 +400,7 @@ const platform = Capacitor.getPlatform(); // 'ios', 'android', 'web'
 if (isNative) {
   const { BiometricAuth } = await import('@aparajita/capacitor-biometric-auth');
   await BiometricAuth.authenticate({
-    reason: 'Authenticate to unlock Recovery Journey'
+    reason: 'Authenticate to unlock Recover'
   });
 }
 ```
@@ -679,7 +679,7 @@ query GetUserProgress {
 
 ```typescript
 // WebSocket connection
-const ws = new WebSocket('wss://api.recoveryjourney.app/ws');
+const ws = new WebSocket('wss://api.getrecover.app/ws');
 
 // Real-time updates
 ws.on('message', (update) => {

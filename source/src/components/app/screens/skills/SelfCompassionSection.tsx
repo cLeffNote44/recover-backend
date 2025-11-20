@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppData } from '@/hooks/useAppData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -13,9 +13,10 @@ import {
 import { EmptyState } from '@/components/EmptyState';
 import { toast } from 'sonner';
 import type { SelfCompassionEntry } from '@/types/app';
+import { selfCompassionSchema, validateFormWithToast } from '@/lib/validation-schemas';
 
 export function SelfCompassionSection() {
-  const { skillBuilding, setSkillBuilding } = useAppContext();
+  const { skillBuilding, setSkillBuilding } = useAppData();
   const [selectedPractice, setSelectedPractice] = useState<typeof SELF_COMPASSION_PRACTICES[0] | null>(null);
   const [showAdd, setShowAdd] = useState(false);
   const [currentAffirmation, setCurrentAffirmation] = useState(getRandomAffirmation());
@@ -32,11 +33,17 @@ export function SelfCompassionSection() {
   const handleSubmit = () => {
     if (!selectedPractice) return;
 
+    // Validate form data with Zod
+    const validatedData = validateFormWithToast(selfCompassionSchema, formData, toast);
+    if (!validatedData) {
+      return;
+    }
+
     const newEntry: SelfCompassionEntry = {
       id: Date.now(),
-      date: new Date().toISOString().split('T')[0],
+      date: new Date().toISOString().split('T')[0]!,
       practiceType: selectedPractice.type,
-      ...formData
+      ...validatedData
     };
 
     setSkillBuilding({
@@ -98,7 +105,6 @@ export function SelfCompassionSection() {
             <Button
               onClick={handleSubmit}
               className="w-full"
-              disabled={!formData.situation || !formData.compassionateResponse}
             >
               Save Practice
             </Button>

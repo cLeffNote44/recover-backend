@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppData } from '@/hooks/useAppData';
 import {
   cloudSync,
   SyncStateManager,
@@ -18,7 +18,7 @@ import {
 import { toast } from 'sonner';
 
 export function CloudSyncPanel() {
-  const context = useAppContext();
+  const context = useAppData();
   const [config, setConfig] = useState<CloudSyncConfig>(SyncStateManager.getConfig());
   const [status, setStatus] = useState<SyncStatus>(SyncStateManager.getStatus());
   const [password, setPassword] = useState('');
@@ -38,8 +38,9 @@ export function CloudSyncPanel() {
   // Load backups list when userId changes
   useEffect(() => {
     if (userId) {
-      const backups = cloudSync.getBackupsList(userId);
-      setBackupsList(backups);
+      cloudSync.getBackupsList(userId).then(backups => {
+        setBackupsList(backups);
+      });
     }
   }, [userId]);
 
@@ -67,7 +68,7 @@ export function CloudSyncPanel() {
 
       if (result.success) {
         toast.success('Backup created successfully!');
-        const backups = cloudSync.getBackupsList(userId);
+        const backups = await cloudSync.getBackupsList(userId);
         setBackupsList(backups);
 
         const newStatus: SyncStatus = {
@@ -148,7 +149,7 @@ export function CloudSyncPanel() {
     const success = await cloudSync.deleteBackup(userId, backupId);
     if (success) {
       toast.success('Backup deleted');
-      const backups = cloudSync.getBackupsList(userId);
+      const backups = await cloudSync.getBackupsList(userId);
       setBackupsList(backups);
     } else {
       toast.error('Failed to delete backup');
@@ -180,7 +181,7 @@ export function CloudSyncPanel() {
         }
 
         setStatus(SyncStateManager.getStatus());
-        const backups = cloudSync.getBackupsList(userId);
+        const backups = await cloudSync.getBackupsList(userId);
         setBackupsList(backups);
       } else {
         toast.error(`Sync failed: ${result.error}`);

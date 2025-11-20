@@ -1,6 +1,6 @@
-# Recovery Journey v5.1 - Installation Guide
+# Recover v5.1 - Installation Guide
 
-Complete step-by-step instructions for setting up and running the Recovery Journey app.
+Complete step-by-step instructions for setting up and running the Recover app.
 
 **Note:** Installation process is the same for v5.1. New features (AI insights, PDF reports, enhanced backup) are included in the build.
 
@@ -130,7 +130,7 @@ VITE v5.0.0  ready in 500 ms
 
 1. Open your web browser (Chrome, Firefox, Safari, or Edge)
 2. Navigate to: `http://localhost:5173`
-3. The Recovery Journey app should load!
+3. The Recover app should load!
 
 ---
 

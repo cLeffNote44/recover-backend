@@ -1,5 +1,8 @@
 import { useState } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useRecoveryStore } from '@/stores/useRecoveryStore';
+import { useJournalStore } from '@/stores/useJournalStore';
+import { useActivitiesStore } from '@/stores/useActivitiesStore';
+import { useSettingsStore } from '@/stores/useSettingsStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,32 +18,42 @@ import { JournalScreenSkeleton } from '@/components/LoadingSkeletons';
 import { AlertTriangle, TrendingUp, Target, Heart, Plus, Trash2, Users, Eye, EyeOff } from 'lucide-react';
 import { TRIGGER_TYPES, MEDITATION_TYPES, RELAPSE_TRIGGERS, RELAPSE_EMOTIONS, SUPPORT_TYPES } from '@/types/app';
 import type { HALTCheck as HALTCheckType, Relapse, CleanPeriod } from '@/types/app';
-import { formatDate, calculateDaysSober } from '@/lib/utils-app';
+import {
+  formatDate,
+  calculateDaysSober,
+  calculateDaysCleanBefore,
+  createRelapseEntry,
+  processRelapseImpact
+} from '@/lib/utils';
 import { toast } from 'sonner';
 
 export function JournalScreen() {
-  const {
-    cravings,
-    setCravings,
-    meetings,
-    setMeetings,
-    growthLogs,
-    setGrowthLogs,
-    challenges,
-    setChallenges,
-    gratitude,
-    setGratitude,
-    meditations,
-    setMeditations,
-    relapses,
-    setRelapses,
-    cleanPeriods,
-    setCleanPeriods,
-    sobrietyDate,
-    setSobrietyDate,
-    loading,
-    celebrationsEnabled
-  } = useAppContext();
+  // Zustand stores
+  const sobrietyDate = useRecoveryStore((state) => state.sobrietyDate);
+  const setSobrietyDate = useRecoveryStore((state) => state.setSobrietyDate);
+  const relapses = useRecoveryStore((state) => state.relapses);
+  const setRelapses = useRecoveryStore((state) => state.setRelapses);
+  const cleanPeriods = useRecoveryStore((state) => state.cleanPeriods);
+  const setCleanPeriods = useRecoveryStore((state) => state.setCleanPeriods);
+
+  const meetings = useJournalStore((state) => state.meetings);
+  const setMeetings = useJournalStore((state) => state.setMeetings);
+  const growthLogs = useJournalStore((state) => state.growthLogs);
+  const setGrowthLogs = useJournalStore((state) => state.setGrowthLogs);
+  const challenges = useJournalStore((state) => state.challenges);
+  const setChallenges = useJournalStore((state) => state.setChallenges);
+  const gratitude = useJournalStore((state) => state.gratitude);
+  const setGratitude = useJournalStore((state) => state.setGratitude);
+  const meditations = useJournalStore((state) => state.meditations);
+  const setMeditations = useJournalStore((state) => state.setMeditations);
+
+  const cravings = useActivitiesStore((state) => state.cravings);
+  const setCravings = useActivitiesStore((state) => state.setCravings);
+
+  const celebrationsEnabled = useSettingsStore((state) => state.celebrationsEnabled);
+
+  // No loading state needed with Zustand
+  const loading = false;
 
   const [activeTab, setActiveTab] = useState('cravings');
 
@@ -109,20 +122,7 @@ export function JournalScreen() {
     isPrivate: false
   });
 
-  // Calculate days clean before relapse
-  const calculateDaysCleanBefore = (relapseDate: string): number => {
-    const mostRecentPeriod = cleanPeriods
-      .filter(p => !p.endDate || p.endDate <= relapseDate)
-      .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())[0];
-
-    if (!mostRecentPeriod) {
-      return calculateDaysSober(sobrietyDate);
-    }
-
-    const start = new Date(mostRecentPeriod.startDate);
-    const end = new Date(relapseDate);
-    return Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-  };
+  // Note: calculateDaysCleanBefore is now imported from utils-app
 
   const handleAddCraving = () => {
     setCravings([...cravings, {
@@ -211,53 +211,18 @@ export function JournalScreen() {
       return;
     }
 
-    const daysCleanBefore = calculateDaysCleanBefore(newRelapse.date);
+    // Calculate days clean before relapse
+    const daysCleanBefore = calculateDaysCleanBefore(newRelapse.date, cleanPeriods, sobrietyDate);
 
-    const relapse: Relapse = {
-      id: Date.now(),
-      date: newRelapse.date,
-      time: newRelapse.time || undefined,
-      substance: newRelapse.substance || undefined,
-      triggers: newRelapse.triggers,
-      circumstances: newRelapse.circumstances,
-      emotions: newRelapse.emotions,
-      thoughts: newRelapse.thoughts,
-      consequences: newRelapse.consequences,
-      lessonsLearned: newRelapse.lessonsLearned,
-      preventionPlan: newRelapse.preventionPlan,
-      supportUsed: newRelapse.supportUsed,
-      severity: newRelapse.severity,
-      daysCleanBefore,
-      isPrivate: newRelapse.isPrivate
-    };
+    // Create relapse entry
+    const relapse = createRelapseEntry(newRelapse, daysCleanBefore);
 
-    // End the current clean period
-    const currentPeriod = cleanPeriods.find(p => !p.endDate);
-    if (currentPeriod) {
-      const updatedPeriods = cleanPeriods.map(p =>
-        p.id === currentPeriod.id
-          ? {
-              ...p,
-              endDate: newRelapse.date,
-              relapseId: relapse.id
-            }
-          : p
-      );
-      setCleanPeriods(updatedPeriods);
-    }
+    // Process impact on clean periods
+    const updatedPeriods = processRelapseImpact(newRelapse.date, relapse.id, cleanPeriods);
+    setCleanPeriods(updatedPeriods);
 
-    // Start a new clean period from tomorrow
-    const tomorrow = new Date(newRelapse.date);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const newPeriod: CleanPeriod = {
-      id: Date.now() + 1,
-      startDate: tomorrow.toISOString().split('T')[0],
-      daysClean: 0,
-      notes: 'Fresh start after setback'
-    };
-    setCleanPeriods([...cleanPeriods, newPeriod]);
-
-    // Update sobriety date to new start
+    // Update sobriety date to new start (day after relapse)
+    const newPeriod = updatedPeriods[updatedPeriods.length - 1]!;
     setSobrietyDate(newPeriod.startDate);
 
     // Save relapse

@@ -12,6 +12,7 @@ import { Capacitor } from '@capacitor/core';
 import type { AppData } from '@/types/app';
 import { calculateDaysSober, calculateStreak } from './utils-app';
 import { getQuoteOfTheDay } from './quotes';
+import WidgetPlugin from '@/plugins/widget-plugin';
 
 export interface WidgetData {
   daysSober: number;
@@ -171,16 +172,25 @@ export async function updateWidgetData(appData: AppData): Promise<boolean> {
     // Store data locally for web preview
     localStorage.setItem(WIDGET_DATA_KEY, JSON.stringify(widgetData));
 
-    // On native platforms, we would use Capacitor to communicate with widget extension
+    // On native platforms, use the Capacitor plugin to communicate with widget extension
     if (areWidgetsSupported()) {
-      // This would be implemented via a Capacitor plugin
-      // For now, we'll use localStorage as the data bridge
-      // The native widget extension would read this data
+      try {
+        // Convert widget data to JSON string
+        const dataString = JSON.stringify(widgetData);
 
-      // Future: Implement native plugin
-      // await WidgetPlugin.updateData(widgetData);
+        // Update widget data via native plugin
+        const result = await WidgetPlugin.updateWidgetData({ data: dataString });
 
-      console.log('Widget data updated:', widgetData);
+        if (result.success) {
+          // Reload widgets to show new data
+          await WidgetPlugin.reloadWidgets();
+          console.log('Native widget updated successfully');
+        } else {
+          console.warn('Failed to update native widget');
+        }
+      } catch (error) {
+        console.error('Error communicating with native widget:', error);
+      }
     }
 
     return true;

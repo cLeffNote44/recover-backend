@@ -169,7 +169,6 @@ const prefersReducedMotion = (): boolean => {
 export const celebrate = (type: CelebrationType) => {
   // Respect user's motion preferences
   if (prefersReducedMotion()) {
-    console.log('Celebrations disabled: user prefers reduced motion');
     return;
   }
 

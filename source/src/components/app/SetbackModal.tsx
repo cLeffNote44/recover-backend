@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppData } from '@/hooks/useAppData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,7 @@ import { AlertCircle, HelpCircle, X } from 'lucide-react';
 import { TRIGGER_TYPES } from '@/types/app';
 import type { Setback, SetbackType } from '@/types/app';
 import { toast } from 'sonner';
+import { setbackSchema, validateFormWithToast } from '@/lib/validation-schemas';
 
 interface SetbackModalProps {
   isOpen: boolean;
@@ -26,7 +27,7 @@ interface SetbackModalProps {
  * This component helps users reflect on setbacks and plan for continued recovery.
  */
 export function SetbackModal({ isOpen, onClose, onSubmit }: SetbackModalProps) {
-  const { setSobrietyDate, setbacks } = useAppContext();
+  const { setSobrietyDate, setbacks } = useAppData();
 
   const [type, setType] = useState<SetbackType>('slip');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -58,23 +59,36 @@ export function SetbackModal({ isOpen, onClose, onSubmit }: SetbackModalProps) {
   }, [isOpen]);
 
   const handleSubmit = () => {
-    // Validation
-    if (!whatHappened.trim()) {
-      toast.error('Please describe what happened');
-      return;
-    }
-
-    const newSetback: Setback = {
-      id: Date.now(),
-      date,
+    // Validate form data with Zod
+    const formData = {
       type,
+      date,
       duration: duration.trim() || undefined,
-      trigger: trigger === 'Other' ? customTrigger : trigger || undefined,
+      trigger: trigger || undefined,
+      customTrigger: customTrigger.trim() || undefined,
       whatHappened: whatHappened.trim(),
       whatLearned: whatLearned.trim() || undefined,
       copingStrategies: copingStrategies.trim() || undefined,
       supportUsed: supportUsed.trim() || undefined,
       continuingRecovery
+    };
+
+    const validatedData = validateFormWithToast(setbackSchema, formData, toast);
+    if (!validatedData) {
+      return;
+    }
+
+    const newSetback: Setback = {
+      id: Date.now(),
+      date: validatedData.date,
+      type: validatedData.type,
+      duration: validatedData.duration,
+      trigger: validatedData.trigger === 'Other' ? validatedData.customTrigger : validatedData.trigger,
+      whatHappened: validatedData.whatHappened,
+      whatLearned: validatedData.whatLearned,
+      copingStrategies: validatedData.copingStrategies,
+      supportUsed: validatedData.supportUsed,
+      continuingRecovery: validatedData.continuingRecovery
     };
 
     // Submit the setback

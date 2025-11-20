@@ -1,6 +1,6 @@
-# Contributing to Recovery Journey
+# Contributing to Recover
 
-Thank you for your interest in contributing to Recovery Journey! This document provides guidelines and instructions for contributing to the project.
+Thank you for your interest in contributing to Recover! This document provides guidelines and instructions for contributing to the project.
 
 ## Table of Contents
 
@@ -466,4 +466,4 @@ By contributing, you agree that your contributions will be licensed under the MI
 
 ---
 
-Thank you for contributing to Recovery Journey! Your work helps people in their recovery journey. 💙
+Thank you for contributing to Recover! Your work helps people in their recovery journey. 💙

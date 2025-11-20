@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppData } from '@/hooks/useAppData';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ import {
   BookOpen,
   Calendar
 } from 'lucide-react';
-import { formatDate } from '@/lib/utils-app';
+import { formatDate } from '@/lib/utils';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -52,7 +52,7 @@ export function SearchModal({ isOpen, onClose, onNavigate }: SearchModalProps) {
     exerciseEntries,
     nutritionEntries,
     relapses
-  } = useAppContext();
+  } = useAppData();
 
   const results = useMemo(() => {
     if (!query.trim()) return [];

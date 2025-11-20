@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppData } from '@/hooks/useAppData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,9 +9,10 @@ import { EmptyState } from '@/components/EmptyState';
 import { Target, Plus, TrendingDown } from 'lucide-react';
 import { toast } from 'sonner';
 import type { TriggerExerciseEntry } from '@/types/app';
+import { triggerExerciseSchema, validateFormWithToast } from '@/lib/validation-schemas';
 
 export function TriggerMasterySection() {
-  const { skillBuilding, setSkillBuilding } = useAppContext();
+  const { skillBuilding, setSkillBuilding } = useAppData();
   const [showAdd, setShowAdd] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState<TriggerExerciseEntry | null>(null);
   const [formData, setFormData] = useState({
@@ -27,10 +28,16 @@ export function TriggerMasterySection() {
   });
 
   const handleSubmit = () => {
+    // Validate form data with Zod
+    const validatedData = validateFormWithToast(triggerExerciseSchema, formData, toast);
+    if (!validatedData) {
+      return;
+    }
+
     const newExercise: TriggerExerciseEntry = {
       id: Date.now(),
-      date: new Date().toISOString().split('T')[0],
-      ...formData
+      date: new Date().toISOString().split('T')[0]!,
+      ...validatedData
     };
 
     setSkillBuilding({
@@ -255,7 +262,6 @@ export function TriggerMasterySection() {
             <Button
               onClick={handleSubmit}
               className="w-full"
-              disabled={!formData.trigger || !formData.thoughts || !formData.feelings || !formData.copingStrategy || !formData.outcome}
             >
               Save Exercise
             </Button>

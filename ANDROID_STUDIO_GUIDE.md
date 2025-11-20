@@ -1,6 +1,6 @@
 # Complete Android Studio Setup & Deployment Guide
 
-## 📱 Recovery Journey - Android Deployment
+## 📱 Recover - Android Deployment
 
 This guide will walk you through setting up Android Studio and deploying your app, step by step.
 
@@ -204,14 +204,14 @@ File: `android/app/src/main/res/values/strings.xml`
 
 ```xml
 <resources>
-    <string name="app_name">Recovery Journey</string>
-    <string name="title_activity_main">Recovery Journey</string>
+    <string name="app_name">Recover</string>
+    <string name="title_activity_main">Recover</string>
     <string name="package_name">com.recovery.journey</string>
     <string name="custom_url_scheme">com.recovery.journey</string>
 </resources>
 ```
 
-Change "Recovery Journey" to whatever you want.
+Change "Recover" to whatever you want.
 
 ### **5.2 Change Version Number**
 
@@ -324,7 +324,7 @@ Google Play requires AAB format (not APK).
 
 2. **Create new app:**
    - Click "Create app"
-   - App name: Recovery Journey
+   - App name: Recover
    - Default language: English
    - App or game: App
    - Free or paid: Free
@@ -525,7 +525,7 @@ npx cap sync android
 
 Once you see your app running on your device with no errors, you're done! 🎉
 
-Your Recovery Journey app is now:
+Your Recover app is now:
 - ✅ Built for Android
 - ✅ Installable on devices
 - ✅ Ready to share (APK)

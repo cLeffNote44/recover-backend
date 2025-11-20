@@ -1,4 +1,4 @@
-# Recovery Journey v5.0 - Complete Package
+# Recover v5.0 - Complete Package
 
 **Your Complete Sobriety Companion**
 

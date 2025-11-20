@@ -1,4 +1,4 @@
-# Recovery Journey - Improvement Roadmap
+# Recover - Improvement Roadmap
 
 **Created:** October 27, 2025
 **Current Version:** 5.1 (Enhanced with AI Analytics)
@@ -9,7 +9,7 @@
 
 ## 📋 **Overview**
 
-This roadmap outlines potential improvements for Recovery Journey, organized by priority and impact. All 31 core features are complete and working. These enhancements will improve user experience, increase engagement, and expand platform capabilities.
+This roadmap outlines potential improvements for Recover, organized by priority and impact. All 31 core features are complete and working. These enhancements will improve user experience, increase engagement, and expand platform capabilities.
 
 ### **Prioritization Framework**
 

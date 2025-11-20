@@ -1,73 +1,78 @@
 /**
  * Activities Store
  *
- * Manages meetings, meditations, cravings, challenges, and calendar events
+ * Manages cravings and calendar events
  */
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Meeting, Meditation, Craving, Challenge, CalendarEvent } from '@/types/app';
+import type { Craving, CalendarEvent } from '@/types/app';
 
 interface ActivitiesState {
   // State
-  meetings: Meeting[];
-  meditations: Meditation[];
   cravings: Craving[];
-  challenges: Challenge[];
   events: CalendarEvent[];
 
   // Actions
-  setMeetings: (meetings: Meeting[]) => void;
-  setMeditations: (meditations: Meditation[]) => void;
   setCravings: (cravings: Craving[]) => void;
-  setChallenges: (challenges: Challenge[]) => void;
   setEvents: (events: CalendarEvent[]) => void;
 
-  // Helpers
-  addMeeting: (meeting: Meeting) => void;
-  addMeditation: (meditation: Meditation) => void;
+  // Helpers - Add
   addCraving: (craving: Craving) => void;
-  addChallenge: (challenge: Challenge) => void;
   addEvent: (event: CalendarEvent) => void;
+
+  // Helpers - Update
+  updateCraving: (id: number, updates: Partial<Craving>) => void;
+  updateEvent: (id: number, updates: Partial<CalendarEvent>) => void;
+
+  // Helpers - Delete
+  deleteCraving: (id: number) => void;
+  deleteEvent: (id: number) => void;
 }
 
 export const useActivitiesStore = create<ActivitiesState>()(
   persist(
     (set) => ({
       // Initial state
-      meetings: [],
-      meditations: [],
       cravings: [],
-      challenges: [],
       events: [],
 
       // Actions
-      setMeetings: (meetings) => set({ meetings }),
-      setMeditations: (meditations) => set({ meditations }),
       setCravings: (cravings) => set({ cravings }),
-      setChallenges: (challenges) => set({ challenges }),
       setEvents: (events) => set({ events }),
 
-      // Helper methods
-      addMeeting: (meeting) =>
-        set((state) => ({
-          meetings: [...state.meetings, meeting],
-        })),
-      addMeditation: (meditation) =>
-        set((state) => ({
-          meditations: [...state.meditations, meditation],
-        })),
+      // Helper methods - Add
       addCraving: (craving) =>
         set((state) => ({
           cravings: [...state.cravings, craving],
         })),
-      addChallenge: (challenge) =>
-        set((state) => ({
-          challenges: [...state.challenges, challenge],
-        })),
       addEvent: (event) =>
         set((state) => ({
           events: [...state.events, event],
+        })),
+
+      // Helper methods - Update
+      updateCraving: (id, updates) =>
+        set((state) => ({
+          cravings: state.cravings.map((item) =>
+            item.id === id ? { ...item, ...updates } : item
+          ),
+        })),
+      updateEvent: (id, updates) =>
+        set((state) => ({
+          events: state.events.map((item) =>
+            item.id === id ? { ...item, ...updates } : item
+          ),
+        })),
+
+      // Helper methods - Delete
+      deleteCraving: (id) =>
+        set((state) => ({
+          cravings: state.cravings.filter((item) => item.id !== id),
+        })),
+      deleteEvent: (id) =>
+        set((state) => ({
+          events: state.events.filter((item) => item.id !== id),
         })),
     }),
     {

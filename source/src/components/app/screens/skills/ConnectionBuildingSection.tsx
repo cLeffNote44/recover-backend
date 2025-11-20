@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppData } from '@/hooks/useAppData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,9 +10,10 @@ import { Users, Plus, RefreshCw, Check } from 'lucide-react';
 import { CONNECTION_PROMPTS, getRandomPrompt, getDailyConnectionPrompt } from '@/lib/connection-prompts';
 import type { ConnectionPromptEntry } from '@/types/app';
 import { toast } from 'sonner';
+import { connectionBuildingSchema, validateFormWithToast } from '@/lib/validation-schemas';
 
 export function ConnectionBuildingSection() {
-  const { skillBuilding, setSkillBuilding } = useAppContext();
+  const { skillBuilding, setSkillBuilding } = useAppData();
   const [selectedType, setSelectedType] = useState<ConnectionPromptEntry['promptType']>('reach-out');
   const [showAdd, setShowAdd] = useState(false);
   const [formData, setFormData] = useState({
@@ -35,11 +36,17 @@ export function ConnectionBuildingSection() {
   };
 
   const handleSubmit = (completed: boolean) => {
+    // Validate form data with Zod
+    const validatedData = validateFormWithToast(connectionBuildingSchema, formData, toast);
+    if (!validatedData) {
+      return;
+    }
+
     const newPrompt: ConnectionPromptEntry = {
       id: Date.now(),
-      date: new Date().toISOString().split('T')[0],
+      date: new Date().toISOString().split('T')[0]!,
       promptType: selectedType,
-      ...formData,
+      ...validatedData,
       completed
     };
 
@@ -104,14 +111,12 @@ export function ConnectionBuildingSection() {
                 onClick={() => handleSubmit(false)}
                 variant="outline"
                 className="flex-1"
-                disabled={!formData.response}
               >
                 Save for Later
               </Button>
               <Button
                 onClick={() => handleSubmit(true)}
                 className="flex-1"
-                disabled={!formData.response}
               >
                 <Check className="w-4 h-4 mr-2" />
                 Mark Complete

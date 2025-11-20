@@ -1,4 +1,4 @@
-# Recovery Journey
+# Recover
 
 > A comprehensive, privacy-first sobriety tracking and recovery support application
 
@@ -9,7 +9,7 @@
 
 ## Overview
 
-Recovery Journey is a feature-rich, privacy-focused application designed to support individuals on their sobriety journey. With daily check-ins, progress tracking, AI-powered risk prediction, and comprehensive recovery tools, this app provides the structure and motivation needed for long-term success.
+Recover is a feature-rich, privacy-focused application designed to support individuals on their sobriety journey. With daily check-ins, progress tracking, AI-powered risk prediction, and comprehensive recovery tools, this app provides the structure and motivation needed for long-term success.
 
 **🔒 Privacy First:** All data is stored locally on your device. No server uploads, no tracking, complete privacy.
 
@@ -91,6 +91,8 @@ pnpm build
 ## Documentation
 
 - **[Features Guide](./docs/FEATURES.md)** - Comprehensive feature documentation
+- **[Supabase Setup](./SUPABASE_SETUP.md)** - Cloud sync configuration guide
+- **[Widget Setup](./WIDGET_SETUP.md)** - Native iOS/Android widget configuration
 - **[Roadmap](./docs/ROADMAP.md)** - Future plans and enterprise features
 - **[Architecture](./docs/ARCHITECTURE.md)** - Technical architecture overview
 - **[Deployment Guide](./docs/DEPLOYMENT.md)** - Deployment instructions
@@ -113,9 +115,9 @@ pnpm build
 - **Workbox** - Service worker and offline support
 
 ### State & Data
-- **Context API** - State management
+- **Zustand** - State management with persistence
 - **localStorage** - Data persistence
-- **IndexedDB (planned)** - Enhanced offline storage
+- **Supabase** - Optional cloud sync and backup
 
 ## Project Structure
 

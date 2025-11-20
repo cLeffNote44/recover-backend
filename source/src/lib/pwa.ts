@@ -21,8 +21,6 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
         scope: '/',
       });
 
-      console.log('[PWA] Service Worker registered:', registration.scope);
-
       // Check for updates periodically
       setInterval(() => {
         registration.update();
@@ -35,7 +33,6 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
     }
   }
 
-  console.log('[PWA] Service Workers not supported');
   return null;
 }
 
@@ -58,7 +55,6 @@ export async function unregisterServiceWorker(): Promise<boolean> {
  */
 export function setupInstallPrompt(): void {
   window.addEventListener('beforeinstallprompt', (e) => {
-    console.log('[PWA] Install prompt available');
     // Prevent Chrome 67 and earlier from automatically showing the prompt
     e.preventDefault();
     // Stash the event so it can be triggered later
@@ -69,7 +65,6 @@ export function setupInstallPrompt(): void {
   });
 
   window.addEventListener('appinstalled', () => {
-    console.log('[PWA] App installed successfully');
     deferredPrompt = null;
 
     // Dispatch custom event

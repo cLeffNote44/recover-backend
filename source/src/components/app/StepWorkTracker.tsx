@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppData } from '@/hooks/useAppData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,7 +10,7 @@ import { CheckCircle2, Circle, Clock, BookOpen, ListChecks, Plus, X, Calendar, E
 import { toast } from 'sonner';
 
 export function StepWorkTracker() {
-  const { stepWork, setStepWork } = useAppContext();
+  const { stepWork, setStepWork } = useAppData();
   const [expandedStep, setExpandedStep] = useState<number | null>(null);
   const [showAddReflection, setShowAddReflection] = useState(false);
   const [showAddExercise, setShowAddExercise] = useState(false);

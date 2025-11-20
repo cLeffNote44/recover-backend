@@ -2,11 +2,33 @@ import { memo } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { LucideIcon } from "lucide-react";
 
+/**
+ * StatCard Component
+ *
+ * Displays a statistic with an icon, label, and value in a card format.
+ * Useful for dashboard metrics and key performance indicators.
+ *
+ * @example
+ * ```tsx
+ * <StatCard
+ *   icon={Trophy}
+ *   label="Days Sober"
+ *   value={30}
+ *   gradient="from-purple-500 to-pink-500"
+ *   onClick={() => navigate('/analytics')}
+ * />
+ * ```
+ */
 interface StatCardProps {
+  /** Lucide icon component to display */
   icon: LucideIcon;
+  /** Descriptive label for the statistic */
   label: string;
+  /** The statistic value to display (number or formatted string) */
   value: string | number;
+  /** Tailwind gradient classes for the icon background (e.g., "from-purple-500 to-pink-500") */
   gradient: string;
+  /** Optional click handler to make the card interactive */
   onClick?: () => void;
 }
 

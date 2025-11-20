@@ -1,6 +1,6 @@
 # End-to-End Tests
 
-This directory contains E2E tests for the Recovery Journey app using Playwright.
+This directory contains E2E tests for the Recover app using Playwright.
 
 ## Running Tests
 

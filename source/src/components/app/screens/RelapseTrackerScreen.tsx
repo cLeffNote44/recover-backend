@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppData } from '@/hooks/useAppData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +10,13 @@ import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
 import { EmptyState } from '@/components/EmptyState';
 import { TrendingUp, Heart, AlertCircle, Eye, EyeOff, Trash2, Plus, Shield, LineChart } from 'lucide-react';
-import { formatDate, calculateDaysSober } from '@/lib/utils-app';
+import {
+  formatDate,
+  calculateDaysSober,
+  calculateDaysCleanBefore,
+  createRelapseEntry,
+  processRelapseImpact
+} from '@/lib/utils';
 import { toast } from 'sonner';
 import type { Relapse, CleanPeriod } from '@/types/app';
 import { RELAPSE_TRIGGERS, RELAPSE_EMOTIONS, SUPPORT_TYPES } from '@/types/app';
@@ -24,7 +30,7 @@ export function RelapseTrackerScreen() {
     sobrietyDate,
     setSobrietyDate,
     loading
-  } = useAppContext();
+  } = useAppData();
 
   const [activeTab, setActiveTab] = useState('progress');
   const [showLogForm, setShowLogForm] = useState(false);
@@ -47,20 +53,7 @@ export function RelapseTrackerScreen() {
     isPrivate: false
   });
 
-  // Calculate days clean before relapse
-  const calculateDaysCleanBefore = (relapseDate: string): number => {
-    const mostRecentPeriod = cleanPeriods
-      .filter(p => !p.endDate || p.endDate <= relapseDate)
-      .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())[0];
-
-    if (!mostRecentPeriod) {
-      return calculateDaysSober(sobrietyDate);
-    }
-
-    const start = new Date(mostRecentPeriod.startDate);
-    const end = new Date(relapseDate);
-    return Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-  };
+  // Note: calculateDaysCleanBefore is now imported from utils-app
 
   // Handle logging a relapse
   const handleLogRelapse = () => {
@@ -74,53 +67,18 @@ export function RelapseTrackerScreen() {
       return;
     }
 
-    const daysCleanBefore = calculateDaysCleanBefore(newRelapse.date);
+    // Calculate days clean before relapse
+    const daysCleanBefore = calculateDaysCleanBefore(newRelapse.date, cleanPeriods, sobrietyDate);
 
-    const relapse: Relapse = {
-      id: Date.now(),
-      date: newRelapse.date,
-      time: newRelapse.time || undefined,
-      substance: newRelapse.substance || undefined,
-      triggers: newRelapse.triggers,
-      circumstances: newRelapse.circumstances,
-      emotions: newRelapse.emotions,
-      thoughts: newRelapse.thoughts,
-      consequences: newRelapse.consequences,
-      lessonsLearned: newRelapse.lessonsLearned,
-      preventionPlan: newRelapse.preventionPlan,
-      supportUsed: newRelapse.supportUsed,
-      severity: newRelapse.severity,
-      daysCleanBefore,
-      isPrivate: newRelapse.isPrivate
-    };
+    // Create relapse entry
+    const relapse = createRelapseEntry(newRelapse, daysCleanBefore);
 
-    // End the current clean period
-    const currentPeriod = cleanPeriods.find(p => !p.endDate);
-    if (currentPeriod) {
-      const updatedPeriods = cleanPeriods.map(p =>
-        p.id === currentPeriod.id
-          ? {
-              ...p,
-              endDate: newRelapse.date,
-              relapseId: relapse.id
-            }
-          : p
-      );
-      setCleanPeriods(updatedPeriods);
-    }
+    // Process impact on clean periods
+    const updatedPeriods = processRelapseImpact(newRelapse.date, relapse.id, cleanPeriods);
+    setCleanPeriods(updatedPeriods);
 
-    // Start a new clean period from tomorrow
-    const tomorrow = new Date(newRelapse.date);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const newPeriod: CleanPeriod = {
-      id: Date.now() + 1,
-      startDate: tomorrow.toISOString().split('T')[0],
-      daysClean: 0,
-      notes: 'Fresh start after setback'
-    };
-    setCleanPeriods([...cleanPeriods, newPeriod]);
-
-    // Update sobriety date to new start
+    // Update sobriety date to new start (day after relapse)
+    const newPeriod = updatedPeriods[updatedPeriods.length - 1]!;
     setSobrietyDate(newPeriod.startDate);
 
     // Save relapse

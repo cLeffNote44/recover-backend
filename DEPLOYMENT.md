@@ -1,6 +1,6 @@
-# Recovery Journey v5.1 - Deployment Guide
+# Recover v5.1 - Deployment Guide
 
-Complete guide to deploying your Recovery Journey app to production hosting.
+Complete guide to deploying your Recover app to production hosting.
 
 **Note:** Deployment process is the same for v5.1. New features (AI insights, PDF reports, enhanced backup) are automatically included in the production build.
 
@@ -8,7 +8,7 @@ Complete guide to deploying your Recovery Journey app to production hosting.
 
 ## Overview
 
-This guide covers deploying the Recovery Journey app to various hosting platforms. The app is a static site (after building), making it compatible with most hosting services.
+This guide covers deploying the Recover app to various hosting platforms. The app is a static site (after building), making it compatible with most hosting services.
 
 ---
 
@@ -380,7 +380,7 @@ If your app needs environment variables:
 
 Create `.env.production`:
 ```
-VITE_APP_NAME=Recovery Journey
+VITE_APP_NAME=Recover
 VITE_API_URL=https://api.example.com
 ```
 
@@ -728,7 +728,7 @@ After deploying:
 
 ---
 
-**Your Recovery Journey app is ready to share with the world!** 🎉
+**Your Recover app is ready to share with the world!** 🎉
 
 **Deploy with confidence. Help others on their recovery journey.** 💪
 

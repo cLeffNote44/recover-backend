@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppData } from '@/hooks/useAppData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,7 @@ import { Plus, Target, Trophy, CheckCircle2, Circle, Trash2, Edit, TrendingUp, C
 import type { Goal, CalendarEvent } from '@/types/app';
 import { toast } from 'sonner';
 import { celebrate } from '@/lib/celebrations';
+import { goalSchema, validateFormWithToast } from '@/lib/validation-schemas';
 
 const CATEGORY_ICONS = {
   recovery: '🎯',
@@ -28,7 +29,7 @@ const CATEGORY_COLORS = {
 };
 
 export function GoalsScreen() {
-  const { goals, setGoals, goalProgress, setGoalProgress, events, setEvents, celebrationsEnabled } = useAppContext();
+  const { goals, setGoals, goalProgress, setGoalProgress, events, setEvents, celebrationsEnabled } = useAppData();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('active');
@@ -367,33 +368,29 @@ function CreateGoalModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.title.trim()) {
-      toast.error('Please enter a goal title');
-      return;
-    }
-
-    if (formData.frequency === 'weekly' && formData.addToCalendar && formData.recurringDays.length === 0) {
-      toast.error('Please select at least one day for weekly recurring goals');
+    // Validate form data with Zod
+    const validatedData = validateFormWithToast(goalSchema, formData, toast);
+    if (!validatedData) {
       return;
     }
 
     const newGoal: Goal = {
       id: Date.now(),
-      title: formData.title,
-      description: formData.description,
-      category: formData.category,
-      targetType: formData.targetType,
-      targetValue: formData.targetType !== 'yes-no' ? formData.targetValue : undefined,
+      title: validatedData.title,
+      description: validatedData.description,
+      category: validatedData.category,
+      targetType: validatedData.targetType,
+      targetValue: validatedData.targetType !== 'yes-no' ? validatedData.targetValue : undefined,
       currentValue: 0,
-      frequency: formData.frequency,
-      recurringDays: formData.frequency === 'weekly' ? formData.recurringDays : undefined,
-      recurringTime: formData.frequency !== 'one-time' ? formData.recurringTime : undefined,
+      frequency: validatedData.frequency,
+      recurringDays: validatedData.frequency === 'weekly' ? validatedData.recurringDays : undefined,
+      recurringTime: validatedData.frequency !== 'one-time' ? validatedData.recurringTime : undefined,
       startDate: new Date().toISOString(),
       isActive: true,
       isCompleted: false,
       streak: 0,
-      reminderEnabled: formData.reminderEnabled,
-      addToCalendar: formData.addToCalendar
+      reminderEnabled: validatedData.reminderEnabled,
+      addToCalendar: validatedData.addToCalendar
     };
 
     // Create calendar event if requested

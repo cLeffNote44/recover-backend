@@ -1,4 +1,4 @@
-# Recovery Journey - Project Summary & Development Log
+# Recover - Project Summary & Development Log
 
 **Date:** October 27, 2025
 **Status:** ✅ ALL CORE & ENHANCEMENT FEATURES COMPLETE
@@ -8,7 +8,7 @@
 
 ## 📋 **Project Overview**
 
-**Recovery Journey** is a comprehensive mobile app for people in addiction recovery. The app provides daily check-ins, HALT assessments, mood tracking, craving logs with trigger analysis, meditation tracking, prevention planning, and powerful analytics - all designed to support users through their recovery journey.
+**Recover** is a comprehensive mobile app for people in addiction recovery. The app provides daily check-ins, HALT assessments, mood tracking, craving logs with trigger analysis, meditation tracking, prevention planning, and powerful analytics - all designed to support users through their recovery journey.
 
 **Target Platforms:**
 - ✅ iOS App Store (Native via Capacitor)
@@ -26,7 +26,7 @@
 ## ✅ **Completed Work**
 
 ### **Phase 1: Initial Setup & Cleanup**
-- ✅ Reviewed existing Recovery Journey v5.0 codebase
+- ✅ Reviewed existing Recover v5.0 codebase
 - ✅ Removed all "urge surfing" references (13 edits across 7 files)
 - ✅ Identified gaps for app store requirements
 - ✅ Consolidated and organized project structure

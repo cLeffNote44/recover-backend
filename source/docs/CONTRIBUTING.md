@@ -1,4 +1,4 @@
-# Contributing to Recovery Journey
+# Contributing to Recover
 
 > Thank you for your interest in contributing! This guide will help you get started.
 
@@ -41,7 +41,7 @@ We are committed to providing a welcoming and supportive environment for all con
 
 ### Enforcement
 
-Violations can be reported to conduct@recoveryjourney.app. All reports will be reviewed and investigated, resulting in appropriate action.
+Violations can be reported to conduct@getrecover.app. All reports will be reviewed and investigated, resulting in appropriate action.
 
 ---
 
@@ -617,7 +617,7 @@ Works fine on Android and web versions.
 
 **Questions?**
 - 💬 [GitHub Discussions](https://github.com/your-repo/discussions)
-- 📧 Email: community@recoveryjourney.app
+- 📧 Email: community@getrecover.app
 - 📖 Read the docs first!
 
 ### Communication Channels
@@ -641,7 +641,7 @@ Works fine on Android and web versions.
 ### Recognition
 
 **Contributors Hall of Fame:**
-We maintain a list of contributors in CONTRIBUTORS.md. Thank you for helping build Recovery Journey!
+We maintain a list of contributors in CONTRIBUTORS.md. Thank you for helping build Recover!
 
 **Special Recognition:**
 - First-time contributors
@@ -684,9 +684,9 @@ By contributing, you agree that your contributions will be licensed under the sa
 Don't hesitate to ask! We're here to help.
 
 - Open a Discussion on GitHub
-- Email: contribute@recoveryjourney.app
+- Email: contribute@getrecover.app
 
-**Thank you for contributing to Recovery Journey!** 🙏
+**Thank you for contributing to Recover!** 🙏
 
 ---
 

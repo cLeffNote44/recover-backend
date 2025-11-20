@@ -1,5 +1,5 @@
 import { useState, useRef, lazy, Suspense } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppData } from '@/hooks/useAppData';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -24,7 +24,7 @@ import type { BackupData } from '@/lib/data-backup';
 import { toast } from 'sonner';
 
 export function SettingsScreen() {
-  const context = useAppContext();
+  const context = useAppData();
   const {
     notificationSettings,
     setNotificationSettings,

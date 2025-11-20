@@ -13,7 +13,7 @@
 ### Step 3: Find Your App
 You should see a list of devices. Look for:
 - Your emulator name (e.g., "Pixel 6 API 33")
-- Under it, you'll see "Recovery Journey" or "com.recovery.journey"
+- Under it, you'll see "Recover" or "io.getrecover.app"
 - Click **"inspect"** next to it
 
 ### Step 4: DevTools Opens
