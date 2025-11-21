@@ -60,9 +60,9 @@ export default function Patients() {
     return matchesSearch && matchesStatus
   })
 
-  const handleCreatePatient = async (formData: any) => {
+  const handleCreatePatient = async (_formData: any) => {
     // TODO: API call to create patient
-    // const response = await api.post('/patients', formData)
+    // const response = await api.post('/patients', _formData)
 
     // Mock response
     const generatedKey = 'REC' + Math.random().toString(36).substring(2, 3).toUpperCase() + '-' +
