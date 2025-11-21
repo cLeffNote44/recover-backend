@@ -32,7 +32,7 @@ export default function Sidebar() {
         <h1 className="text-xl font-bold tracking-tight">
           Recover
         </h1>
-        <p className="text-primary-300 text-xs mt-1">Facility Portal</p>
+        <p className="text-primary-300 text-xs mt-1">Clinician Portal</p>
       </div>
 
       {/* User Profile */}

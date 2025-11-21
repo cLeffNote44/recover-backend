@@ -80,7 +80,7 @@ export default function LoginPage() {
       <div className="hidden lg:flex lg:w-1/2 bg-primary-900 text-white p-12 flex-col justify-between">
         <div>
           <h1 className="text-3xl font-bold">Recover</h1>
-          <p className="text-primary-300 mt-1">Facility Portal</p>
+          <p className="text-primary-300 mt-1">Clinician Portal</p>
         </div>
 
         <div className="space-y-6">
@@ -104,7 +104,7 @@ export default function LoginPage() {
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
             <h1 className="text-2xl font-bold text-primary-900">Recover</h1>
-            <p className="text-gray-500">Facility Portal</p>
+            <p className="text-gray-500">Clinician Portal</p>
           </div>
 
           <div className="bg-white rounded-2xl shadow-lg p-8">
