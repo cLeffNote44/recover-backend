@@ -55,7 +55,7 @@ export default function Patients() {
   const [newPatientKey, setNewPatientKey] = useState<string | null>(null)
   const [copiedKey, setCopiedKey] = useState(false)
   const [patients, setPatients] = useState(mockPatients)
-  const [isLoading, setIsLoading] = useState(true)
+  const [_isLoading, setIsLoading] = useState(true)
 
   // Fetch patients from API
   useEffect(() => {

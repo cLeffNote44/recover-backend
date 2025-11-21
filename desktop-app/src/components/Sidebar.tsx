@@ -11,14 +11,17 @@ import {
   Mail,
   HelpCircle,
   ChevronDown,
-  Building2,
-  UserCog,
-  Stethoscope,
   BarChart3,
-  Shield,
 } from 'lucide-react'
 
-const staffNavItems = [
+interface NavItem {
+  path: string
+  icon: typeof Home
+  label: string
+  badge?: number
+}
+
+const staffNavItems: NavItem[] = [
   { path: '/', icon: Home, label: 'Home' },
   { path: '/patients', icon: Users, label: 'Patients' },
   { path: '/messages', icon: MessageSquare, label: 'Messages', badge: 4 },
@@ -26,7 +29,7 @@ const staffNavItems = [
   { path: '/settings', icon: Settings, label: 'Settings' },
 ]
 
-const superAdminNavItems = [
+const superAdminNavItems: NavItem[] = [
   { path: '/', icon: BarChart3, label: 'Dashboard' },
   { path: '/settings', icon: Settings, label: 'Settings' },
 ]

@@ -10,11 +10,8 @@ import {
   Activity,
   AlertCircle,
   CheckCircle,
-  Clock,
   Plus,
   Search,
-  Filter,
-  MoreVertical,
   Eye,
   Edit,
   Pause,
@@ -83,10 +80,10 @@ export default function SuperAdminDashboard() {
   const [showWizard, setShowWizard] = useState(false)
   const [stats, setStats] = useState(mockStats)
   const [facilities, setFacilities] = useState(mockFacilities)
-  const [administrators, setAdministrators] = useState(mockAdministrators)
-  const [clinicians, setClinicians] = useState(mockClinicians)
-  const [patients, setPatients] = useState(mockPatients)
-  const [isLoading, setIsLoading] = useState(true)
+  const [administrators, _setAdministrators] = useState(mockAdministrators)
+  const [clinicians, _setClinicians] = useState(mockClinicians)
+  const [patients, _setPatients] = useState(mockPatients)
+  const [_isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
 
