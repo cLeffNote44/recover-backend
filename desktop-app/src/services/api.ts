@@ -207,6 +207,112 @@ export const facilityAPI = {
 };
 
 // ============================================================================
+// SUPER ADMIN API
+// ============================================================================
+
+export interface CreateFacilityData {
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  phone: string;
+  email: string;
+  license_number?: string;
+}
+
+export interface CreateAdminData {
+  facility_id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone?: string;
+  temp_password: string;
+}
+
+export const superAdminAPI = {
+  // Stats
+  getStats: async () => {
+    const response = await api.get('/admin/stats');
+    return response.data;
+  },
+
+  // Facilities
+  getFacilities: async (filters: { status?: string } = {}) => {
+    const params = new URLSearchParams();
+    if (filters.status) params.append('status', filters.status);
+    const response = await api.get(`/admin/facilities?${params.toString()}`);
+    return response.data;
+  },
+
+  getFacility: async (id: string) => {
+    const response = await api.get(`/admin/facilities/${id}`);
+    return response.data;
+  },
+
+  createFacility: async (data: CreateFacilityData) => {
+    const response = await api.post('/admin/facilities', data);
+    return response.data;
+  },
+
+  updateFacility: async (id: string, data: Partial<CreateFacilityData>) => {
+    const response = await api.put(`/admin/facilities/${id}`, data);
+    return response.data;
+  },
+
+  suspendFacility: async (id: string) => {
+    const response = await api.post(`/admin/facilities/${id}/suspend`);
+    return response.data;
+  },
+
+  // Administrators
+  getAdministrators: async () => {
+    const response = await api.get('/admin/administrators');
+    return response.data;
+  },
+
+  createAdministrator: async (data: CreateAdminData) => {
+    const response = await api.post('/admin/administrators', data);
+    return response.data;
+  },
+
+  resetAdminPassword: async (id: string) => {
+    const response = await api.post(`/admin/administrators/${id}/reset-password`);
+    return response.data;
+  },
+
+  // Clinicians (all staff across facilities)
+  getAllClinicians: async (filters: { role?: string; facility_id?: string } = {}) => {
+    const params = new URLSearchParams();
+    if (filters.role) params.append('role', filters.role);
+    if (filters.facility_id) params.append('facility_id', filters.facility_id);
+    const response = await api.get(`/admin/clinicians?${params.toString()}`);
+    return response.data;
+  },
+
+  // Patients (all patients across facilities)
+  getAllPatients: async (filters: { status?: string; facility_id?: string } = {}) => {
+    const params = new URLSearchParams();
+    if (filters.status) params.append('status', filters.status);
+    if (filters.facility_id) params.append('facility_id', filters.facility_id);
+    const response = await api.get(`/admin/patients?${params.toString()}`);
+    return response.data;
+  },
+
+  // Analytics
+  getAnalytics: async (timeframe: string = '30d') => {
+    const response = await api.get(`/admin/analytics?timeframe=${timeframe}`);
+    return response.data;
+  },
+
+  // Activity Feed
+  getRecentActivity: async (limit: number = 20) => {
+    const response = await api.get(`/admin/activity?limit=${limit}`);
+    return response.data;
+  },
+};
+
+// ============================================================================
 // HEALTH CHECK
 // ============================================================================
 
