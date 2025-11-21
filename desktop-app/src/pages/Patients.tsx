@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import {
   Search,
@@ -9,8 +9,9 @@ import {
   Check,
   X,
 } from 'lucide-react'
+import { patientsAPI } from '../services/api'
 
-// Mock data
+// Mock data for offline mode
 const mockPatients = [
   {
     id: '30000000-0000-0000-0000-000000000001',
@@ -53,22 +54,50 @@ export default function Patients() {
   const [showNewPatientModal, setShowNewPatientModal] = useState(searchParams.get('new') === 'true')
   const [newPatientKey, setNewPatientKey] = useState<string | null>(null)
   const [copiedKey, setCopiedKey] = useState(false)
+  const [patients, setPatients] = useState(mockPatients)
+  const [isLoading, setIsLoading] = useState(true)
 
-  const filteredPatients = mockPatients.filter((p) => {
+  // Fetch patients from API
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const response = await patientsAPI.getAll({ status: statusFilter !== 'all' ? statusFilter : undefined })
+        if (response.success && response.patients) {
+          setPatients(response.patients)
+        }
+      } catch (err) {
+        console.log('Using mock data - API unavailable')
+        setPatients(mockPatients)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchPatients()
+  }, [statusFilter])
+
+  const filteredPatients = patients.filter((p) => {
     const matchesSearch = `${p.first_name} ${p.last_name}`.toLowerCase().includes(search.toLowerCase())
-    const matchesStatus = statusFilter === 'all' || p.status === statusFilter
-    return matchesSearch && matchesStatus
+    return matchesSearch
   })
 
   const handleCreatePatient = async (formData: any) => {
-    // TODO: API call to create patient
-    // const response = await api.post('/patients', formData)
+    try {
+      const response = await patientsAPI.create(formData)
+      if (response.success && response.registration_key) {
+        setNewPatientKey(response.registration_key)
+        // Refresh patient list
+        const updated = await patientsAPI.getAll({})
+        if (updated.success) setPatients(updated.patients)
+        return
+      }
+    } catch (err) {
+      console.log('Using mock registration key - API unavailable')
+    }
 
-    // Mock response
+    // Fallback mock key
     const generatedKey = 'REC' + Math.random().toString(36).substring(2, 3).toUpperCase() + '-' +
       Math.random().toString(36).substring(2, 6).toUpperCase() + '-' +
       Math.random().toString(36).substring(2, 6).toUpperCase()
-
     setNewPatientKey(generatedKey)
   }
 

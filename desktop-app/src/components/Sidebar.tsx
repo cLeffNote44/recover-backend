@@ -11,9 +11,14 @@ import {
   Mail,
   HelpCircle,
   ChevronDown,
+  Building2,
+  UserCog,
+  Stethoscope,
+  BarChart3,
+  Shield,
 } from 'lucide-react'
 
-const navItems = [
+const staffNavItems = [
   { path: '/', icon: Home, label: 'Home' },
   { path: '/patients', icon: Users, label: 'Patients' },
   { path: '/messages', icon: MessageSquare, label: 'Messages', badge: 4 },
@@ -21,9 +26,16 @@ const navItems = [
   { path: '/settings', icon: Settings, label: 'Settings' },
 ]
 
+const superAdminNavItems = [
+  { path: '/', icon: BarChart3, label: 'Dashboard' },
+  { path: '/settings', icon: Settings, label: 'Settings' },
+]
+
 export default function Sidebar() {
   const { user, logout } = useAuthStore()
   const location = useLocation()
+  const isSuperAdmin = user?.role === 'super_admin'
+  const navItems = isSuperAdmin ? superAdminNavItems : staffNavItems
 
   return (
     <aside className="sidebar w-64 bg-primary-900 text-white flex flex-col">
@@ -32,7 +44,9 @@ export default function Sidebar() {
         <h1 className="text-xl font-bold tracking-tight">
           Recover
         </h1>
-        <p className="text-primary-300 text-xs mt-1">Facility Portal</p>
+        <p className="text-primary-300 text-xs mt-1">
+          {isSuperAdmin ? 'Super Admin' : 'Clinician Portal'}
+        </p>
       </div>
 
       {/* User Profile */}
