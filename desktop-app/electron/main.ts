@@ -133,22 +133,36 @@ function createWindow() {
 // APP LIFECYCLE
 // ============================================================================
 
-app.whenReady().then(() => {
-  createWindow();
-  setupAutoUpdater();
-});
+// Ensure single instance
+const gotTheLock = app.requestSingleInstanceLock();
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
 
-app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
+  app.whenReady().then(() => {
     createWindow();
-  }
-});
+    setupAutoUpdater();
+  });
+
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+      app.quit();
+    }
+  });
+
+  app.on('activate', () => {
+    if (app.isReady() && BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
+  });
+}
 
 // ============================================================================
 // IPC HANDLERS
