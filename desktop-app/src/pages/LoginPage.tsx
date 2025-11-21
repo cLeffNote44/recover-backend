@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAuthStore } from '../stores/authStore'
-import { Eye, EyeOff, LogIn } from 'lucide-react'
+import { authAPI, healthCheck } from '../services/api'
+import { Eye, EyeOff, LogIn, AlertCircle } from 'lucide-react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -8,8 +9,16 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [serverStatus, setServerStatus] = useState<'checking' | 'online' | 'offline'>('checking')
 
   const { login } = useAuthStore()
+
+  // Check server status on mount
+  useState(() => {
+    healthCheck().then((result) => {
+      setServerStatus(result.status === 'healthy' ? 'online' : 'offline')
+    })
+  })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -17,42 +26,49 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      // TODO: Replace with actual API call
-      // const response = await api.post('/auth/staff/login', { email, password })
+      const response = await authAPI.staffLogin(email, password)
 
-      // Mock login for development
-      await new Promise(resolve => setTimeout(resolve, 1000))
-
-      if (email === 'admin@recoversystem.com' && password === 'SuperAdmin123!') {
-        login(
-          {
-            id: '00000000-0000-0000-0000-000000000001',
-            email: 'admin@recoversystem.com',
-            first_name: 'System',
-            last_name: 'Administrator',
-            role: 'super_admin',
-          },
-          'mock-access-token',
-          'mock-refresh-token'
-        )
-      } else if (email === 'dr.martinez@hoperecovery.com' && password === 'Counselor123!') {
-        login(
-          {
-            id: '20000000-0000-0000-0000-000000000002',
-            email: 'dr.martinez@hoperecovery.com',
-            first_name: 'Maria',
-            last_name: 'Martinez',
-            role: 'counselor',
-            facility_id: '10000000-0000-0000-0000-000000000001',
-          },
-          'mock-access-token',
-          'mock-refresh-token'
-        )
+      if (response.success) {
+        login(response.user, response.accessToken, response.refreshToken)
       } else {
-        throw new Error('Invalid email or password')
+        throw new Error(response.error || 'Login failed')
       }
     } catch (err: any) {
-      setError(err.message || 'Login failed. Please try again.')
+      // If server is offline, use mock login for demo
+      if (err.code === 'ERR_NETWORK' || serverStatus === 'offline') {
+        console.log('Server offline, using mock login')
+        if (email === 'admin@recoversystem.com' && password === 'SuperAdmin123!') {
+          login(
+            {
+              id: '00000000-0000-0000-0000-000000000001',
+              email: 'admin@recoversystem.com',
+              first_name: 'System',
+              last_name: 'Administrator',
+              role: 'super_admin',
+            },
+            'mock-access-token',
+            'mock-refresh-token'
+          )
+          return
+        } else if (email === 'dr.martinez@hoperecovery.com' && password === 'Counselor123!') {
+          login(
+            {
+              id: '20000000-0000-0000-0000-000000000002',
+              email: 'dr.martinez@hoperecovery.com',
+              first_name: 'Maria',
+              last_name: 'Martinez',
+              role: 'counselor',
+              facility_id: '10000000-0000-0000-0000-000000000001',
+            },
+            'mock-access-token',
+            'mock-refresh-token'
+          )
+          return
+        }
+        setError('Server offline. Use demo credentials to test.')
+      } else {
+        setError(err.response?.data?.error || err.message || 'Login failed. Please try again.')
+      }
     } finally {
       setIsLoading(false)
     }
@@ -93,7 +109,15 @@ export default function LoginPage() {
 
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome back</h2>
-            <p className="text-gray-500 mb-8">Sign in to your account</p>
+            <p className="text-gray-500 mb-6">Sign in to your account</p>
+
+            {/* Server Status */}
+            {serverStatus === 'offline' && (
+              <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700 text-sm flex items-center gap-2">
+                <AlertCircle className="w-4 h-4" />
+                <span>Server offline - Demo mode available</span>
+              </div>
+            )}
 
             {error && (
               <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
